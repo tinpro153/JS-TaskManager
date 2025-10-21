@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # JS Task Manager
 
 A full-stack Task Management System web application with user authentication, task CRUD, and deployment-ready setup.
@@ -164,3 +165,6 @@ Add tests with your preferred test runner (Jest, Mocha). Example test ideas:
 ## License
 
 MIT
+=======
+A full-stack Task Management System web application featuring robust user authentication (Register/Login/Logout) using bcrypt for password hashing and JWT for session security. The system utilizes MongoDB/Mongoose for data management and provides full CRUD functionality for tasks, allowing classification by status (Pending, In Progress, Completed). Security is enhanced via Helmet/CORS and configuration managed by dotenv. Deployment target is Heroku/Docker.
+>>>>>>> 0596063e3fe10daa6f86cbe4274928dc2cbc7b32
