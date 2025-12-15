@@ -94,17 +94,19 @@ class UserModel {
      */
     static async update(pool, id, { username, email }) {
         const request = pool.request();
-        const result = await request
+        // UPDATE without OUTPUT due to trigger conflict
+        await request
             .input('id', sql.UniqueIdentifier, id)
             .input('username', sql.NVarChar(50), username)
-            .input('email', sql.NVarChar(255), email.toLowerCase())
+            .input('email', sql.NVarChar(255), email)
             .query(`
                 UPDATE ${this.TABLE_NAME}
                 SET username = @username, email = @email
-                OUTPUT INSERTED.*
                 WHERE id = @id
             `);
-        return result.recordset[0] || null;
+        
+        // Fetch updated record
+        return await this.findById(pool, id);
     }
 
     /**
@@ -112,16 +114,18 @@ class UserModel {
      */
     static async updatePassword(pool, id, hashedPassword) {
         const request = pool.request();
-        const result = await request
+        // UPDATE without OUTPUT due to trigger conflict
+        await request
             .input('id', sql.UniqueIdentifier, id)
             .input('password', sql.NVarChar(255), hashedPassword)
             .query(`
                 UPDATE ${this.TABLE_NAME}
                 SET password = @password
-                OUTPUT INSERTED.*
                 WHERE id = @id
             `);
-        return result.recordset[0] || null;
+        
+        // Fetch updated record
+        return await this.findById(pool, id);
     }
 
     /**

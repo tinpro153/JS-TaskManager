@@ -19,6 +19,10 @@ class GetTasksOutputDTO {
             description: task.getDescription(),
             status: task.getStatus(),
             userId: task.getUserId(),
+            startDate: task.getStartDate(),
+            deadline: task.getDeadline(),
+            progress: task.getProgressPercentage(),
+            isOverdue: task.isOverdue(),
             createdAt: task.getCreatedAt(),
             updatedAt: task.getUpdatedAt()
         }));
@@ -46,6 +50,10 @@ class GetTaskOutputDTO {
         this.description = task.getDescription();
         this.status = task.getStatus();
         this.userId = task.getUserId();
+        this.startDate = task.getStartDate();
+        this.deadline = task.getDeadline();
+        this.progress = task.getProgressPercentage();
+        this.isOverdue = task.isOverdue();
         this.createdAt = task.getCreatedAt();
         this.updatedAt = task.getUpdatedAt();
     }

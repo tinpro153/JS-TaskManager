@@ -49,7 +49,7 @@ function setupEventListeners() {
     document.getElementById('taskForm').addEventListener('submit', handleTaskFormSubmit);
 
     // Modal close buttons
-    document.querySelector('.modal .close').addEventListener('click', closeTaskModal);
+    document.querySelector('.close-btn').addEventListener('click', closeTaskModal);
     document.getElementById('cancelTaskBtn').addEventListener('click', closeTaskModal);
 
     // Click outside modal to close
@@ -59,8 +59,8 @@ function setupEventListeners() {
         }
     });
 
-    // Filter tabs
-    document.querySelectorAll('.tab-btn').forEach(btn => {
+    // Filter buttons
+    document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const status = e.target.dataset.status;
             handleFilterChange(status);
@@ -97,17 +97,31 @@ async function loadStatistics() {
 
 async function loadTasks(status = null) {
     const taskList = document.getElementById('taskList');
-    taskList.innerHTML = '<div class="loading">Đang tải...</div>';
+    taskList.innerHTML = `
+        <div class="loading">
+            <div class="spinner"></div>
+            <p>Đang tải công việc...</p>
+        </div>
+    `;
 
     try {
         const response = await API.getTasks(status);
         
         if (response.success && response.tasks) {
             if (response.tasks.length === 0) {
+                const emptyMessages = {
+                    'ALL': 'Chưa có công việc nào. Hãy tạo công việc đầu tiên!',
+                    'PENDING': 'Không có công việc chờ xử lý',
+                    'IN_PROGRESS': 'Không có công việc đang làm',
+                    'COMPLETED': 'Chưa hoàn thành công việc nào'
+                };
+                const message = emptyMessages[currentFilter] || emptyMessages['ALL'];
+                
                 taskList.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-state-icon">📋</div>
-                        <p>Chưa có công việc nào</p>
+                        <p>${message}</p>
+                        ${currentFilter === 'ALL' ? '<button class="btn btn-primary" onclick="document.getElementById(\'createTaskBtn\').click()">Tạo công việc ngay</button>' : ''}
                     </div>
                 `;
                 return;
@@ -117,69 +131,81 @@ async function loadTasks(status = null) {
             
             // Attach event listeners to task actions
             attachTaskActionListeners();
+            
+            // Add fade-in animation
+            setTimeout(() => {
+                document.querySelectorAll('.task-item').forEach((item, index) => {
+                    setTimeout(() => {
+                        item.classList.add('fade-in');
+                    }, index * 50);
+                });
+            }, 10);
         }
     } catch (error) {
         console.error('Failed to load tasks:', error);
         taskList.innerHTML = `
-            <div class="error-message">
-                Không thể tải danh sách công việc. Vui lòng thử lại.
+            <div class="error-state">
+                <div class="error-icon">⚠️</div>
+                <p>Không thể tải danh sách công việc</p>
+                <p class="error-details">${error.message}</p>
+                <button class="btn btn-primary" onclick="loadTasks(${status ? '\''+status+'\'' : 'null'})">Thử lại</button>
             </div>
         `;
     }
 }
 
 function createTaskCard(task) {
-    const statusClass = `status-${task.status}`;
-    const statusText = Utils.getStatusText(task.status);
+    // Progress bar color based on percentage
+    let progressClass = 'safe';
+    let progressPercent = task.progress || 0;
     
-    // Status change buttons based on current status
-    let statusButtons = '';
-    if (task.status === 'PENDING') {
-        statusButtons = `
-            <button class="btn btn-success btn-status" data-id="${task.id}" data-status="IN_PROGRESS">
-                🔄 Bắt đầu
-            </button>
-            <button class="btn btn-success btn-status" data-id="${task.id}" data-status="COMPLETED">
-                ✅ Hoàn thành
-            </button>
-        `;
-    } else if (task.status === 'IN_PROGRESS') {
-        statusButtons = `
-            <button class="btn btn-secondary btn-status" data-id="${task.id}" data-status="PENDING">
-                ⏳ Chờ xử lý
-            </button>
-            <button class="btn btn-success btn-status" data-id="${task.id}" data-status="COMPLETED">
-                ✅ Hoàn thành
-            </button>
-        `;
-    } else if (task.status === 'COMPLETED') {
-        statusButtons = `<span style="color: var(--success-color); font-weight: 500;">✓ Đã hoàn thành</span>`;
+    if (progressPercent >= 80) {
+        progressClass = 'danger';
+    } else if (progressPercent >= 50) {
+        progressClass = 'warning';
     }
+    
+    // Format dates
+    const startDateStr = task.startDate ? Utils.formatDate(task.startDate) : 'N/A';
+    const deadlineStr = task.deadline ? Utils.formatDate(task.deadline) : 'Không có';
+    
+    // Quick complete button
+    const quickCompleteBtn = task.status !== 'COMPLETED' ? 
+        `<button class="quick-complete-btn" data-id="${task.id}" data-status="COMPLETED">✓ Hoàn thành</button>` : '';
 
     return `
-        <div class="task-item">
+        <div class="task-card">
             <div class="task-header">
-                <div>
-                    <div class="task-title">${escapeHtml(task.title)}</div>
-                    <span class="task-status ${statusClass}">${statusText}</span>
+                <h3 class="task-title">${escapeHtml(task.title)}</h3>
+                <div class="task-actions">
+                    <button class="btn btn-icon btn-secondary btn-edit" data-id="${task.id}" title="Sửa">✏️</button>
+                    <button class="btn btn-icon btn-danger btn-delete" data-id="${task.id}" title="Xóa">🗑️</button>
                 </div>
             </div>
             
             ${task.description ? `<div class="task-description">${escapeHtml(task.description)}</div>` : ''}
             
             <div class="task-meta">
-                <span>📅 Tạo: ${Utils.formatDate(task.createdAt)}</span>
-                <span>🔄 Cập nhật: ${Utils.formatDate(task.updatedAt)}</span>
+                <div class="meta-item">📅 Bắt đầu: ${startDateStr}</div>
+                <div class="meta-item">⏰ Deadline: ${deadlineStr}</div>
+                ${task.isOverdue ? '<div class="meta-item" style="color: var(--progress-danger); font-weight: 600;">⚠️ Quá hạn!</div>' : ''}
             </div>
             
-            <div class="task-actions">
-                ${statusButtons}
-                <button class="btn btn-secondary btn-edit" data-id="${task.id}">
-                    ✏️ Sửa
-                </button>
-                <button class="btn btn-danger btn-delete" data-id="${task.id}">
-                    🗑️ Xóa
-                </button>
+            ${task.deadline ? `
+            <div class="task-progress">
+                <div class="progress-label">
+                    <span>Tiến độ thời gian</span>
+                    <span>${Math.round(progressPercent)}%</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar ${progressClass}" style="width: ${Math.min(progressPercent, 100)}%"></div>
+                </div>
+            </div>
+            ` : ''}
+            
+            <div class="task-footer">
+                <span class="task-status-badge ${task.status}">${Utils.getStatusText(task.status)}</span>
+                ${quickCompleteBtn}
             </div>
         </div>
     `;
@@ -202,8 +228,8 @@ function attachTaskActionListeners() {
         });
     });
 
-    // Status change buttons
-    document.querySelectorAll('.btn-status').forEach(btn => {
+    // Quick complete buttons
+    document.querySelectorAll('.quick-complete-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const taskId = e.currentTarget.dataset.id;
             const newStatus = e.currentTarget.dataset.status;
@@ -215,8 +241,8 @@ function attachTaskActionListeners() {
 function handleFilterChange(status) {
     currentFilter = status;
 
-    // Update active tab
-    document.querySelectorAll('.tab-btn').forEach(btn => {
+    // Update active button
+    document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.classList.remove('active');
         if (btn.dataset.status === status) {
             btn.classList.add('active');
@@ -241,20 +267,31 @@ function openTaskModal(task = null) {
         document.getElementById('taskId').value = task.id;
         document.getElementById('taskTitle').value = task.title;
         document.getElementById('taskDescription').value = task.description || '';
+        
+        // Set dates if available
+        if (task.startDate) {
+            document.getElementById('taskStartDate').value = formatDateForInput(task.startDate);
+        }
+        if (task.deadline) {
+            document.getElementById('taskDeadline').value = formatDateForInput(task.deadline);
+        }
     } else {
         // Create mode
         modalTitle.textContent = 'Tạo công việc mới';
         taskForm.reset();
         document.getElementById('taskId').value = '';
+        
+        // Set default start date to now
+        document.getElementById('taskStartDate').value = formatDateForInput(new Date());
     }
 
     Utils.hideError('taskFormError');
-    modal.classList.add('show');
+    modal.classList.add('active');
 }
 
 function closeTaskModal() {
     const modal = document.getElementById('taskModal');
-    modal.classList.remove('show');
+    modal.classList.remove('active');
     currentEditingTaskId = null;
 }
 
@@ -264,24 +301,42 @@ async function handleTaskFormSubmit(e) {
 
     const title = document.getElementById('taskTitle').value.trim();
     const description = document.getElementById('taskDescription').value.trim();
+    const startDate = document.getElementById('taskStartDate').value;
+    const deadline = document.getElementById('taskDeadline').value;
     const taskId = document.getElementById('taskId').value;
 
     if (!title) {
         Utils.showError('taskFormError', 'Vui lòng nhập tiêu đề');
         return;
     }
+    
+    // Validate deadline is after startDate
+    if (startDate && deadline && new Date(deadline) <= new Date(startDate)) {
+        Utils.showError('taskFormError', 'Deadline phải sau ngày bắt đầu');
+        return;
+    }
 
     const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Đang lưu...';
+    submitBtn.textContent = '⏳ Đang lưu...';
 
     try {
+        const taskData = {
+            title,
+            description,
+            startDate: startDate || undefined,
+            deadline: deadline || undefined
+        };
+        
         if (taskId) {
             // Update task
-            await API.updateTask(taskId, title, description);
+            await API.updateTask(taskId, taskData);
+            showNotification('Đã cập nhật công việc thành công', 'success');
         } else {
             // Create new task
-            await API.createTask(title, description);
+            await API.createTask(taskData);
+            showNotification('Đã tạo công việc mới thành công', 'success');
         }
 
         closeTaskModal();
@@ -291,42 +346,59 @@ async function handleTaskFormSubmit(e) {
         Utils.showError('taskFormError', error.message || 'Có lỗi xảy ra. Vui lòng thử lại.');
     } finally {
         submitBtn.disabled = false;
-        submitBtn.textContent = 'Lưu';
+        submitBtn.textContent = originalText;
     }
 }
 
 async function handleEditTask(taskId) {
+    if (!taskId) {
+        showNotification('Không tìm thấy thông tin công việc', 'error');
+        return;
+    }
+    
     try {
         const response = await API.getTaskById(taskId);
         if (response.success && response.task) {
             openTaskModal(response.task);
         }
     } catch (error) {
-        alert('Không thể tải thông tin công việc: ' + error.message);
+        showNotification('Không thể tải thông tin công việc: ' + error.message, 'error');
     }
 }
 
 async function handleDeleteTask(taskId) {
+    if (!taskId) {
+        showNotification('Không tìm thấy thông tin công việc', 'error');
+        return;
+    }
+    
     if (!confirm('Bạn có chắc chắn muốn xóa công việc này?')) {
         return;
     }
 
     try {
         await API.deleteTask(taskId);
+        showNotification('Đã xóa công việc thành công', 'success');
         await loadStatistics();
         await loadTasks(currentFilter === 'ALL' ? null : currentFilter);
     } catch (error) {
-        alert('Không thể xóa công việc: ' + error.message);
+        showNotification('Không thể xóa công việc: ' + error.message, 'error');
     }
 }
 
 async function handleStatusChange(taskId, newStatus) {
+    if (!taskId) {
+        showNotification('Không tìm thấy thông tin công việc', 'error');
+        return;
+    }
+    
     try {
         await API.changeTaskStatus(taskId, newStatus);
+        showNotification('Đã cập nhật trạng thái thành công', 'success');
         await loadStatistics();
         await loadTasks(currentFilter === 'ALL' ? null : currentFilter);
     } catch (error) {
-        alert('Không thể thay đổi trạng thái: ' + error.message);
+        showNotification('Không thể thay đổi trạng thái: ' + error.message, 'error');
     }
 }
 
@@ -349,4 +421,36 @@ function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+function showNotification(message, type = 'success') {
+    // Remove existing notifications
+    const existing = document.querySelector('.toast');
+    if (existing) {
+        existing.remove();
+    }
+    
+    // Create toast
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+    
+    // Add to page
+    document.body.appendChild(toast);
+    
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}
+
+// Helper function to format date for datetime-local input
+function formatDateForInput(date) {
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    const hours = String(d.getHours()).padStart(2, '0');
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
 }

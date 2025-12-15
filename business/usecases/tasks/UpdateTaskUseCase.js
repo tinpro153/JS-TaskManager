@@ -35,7 +35,7 @@ class UpdateTaskUseCase {
 
         // Step 4: Update task using domain logic
         try {
-            task.update(inputDTO.title, inputDTO.description, inputDTO.status);
+            task.update(inputDTO.title, inputDTO.description, inputDTO.status, inputDTO.startDate, inputDTO.deadline);
         } catch (error) {
             if (error instanceof DomainException) {
                 throw error;

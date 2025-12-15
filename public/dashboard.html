@@ -21,58 +21,55 @@
     
     <div class="container">
         <!-- Statistics Cards -->
-        <div class="stats-grid">
-            <div class="stat-card stat-total">
-                <div class="stat-icon">📊</div>
-                <div class="stat-content">
-                    <h3 id="statTotal">0</h3>
-                    <p>Tổng công việc</p>
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-label">Tổng công việc</span>
+                    <span class="stat-icon">📊</span>
                 </div>
+                <div class="stat-value" id="statTotal">0</div>
             </div>
             
-            <div class="stat-card stat-pending">
-                <div class="stat-icon">⏳</div>
-                <div class="stat-content">
-                    <h3 id="statPending">0</h3>
-                    <p>Chờ xử lý</p>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-label">Chờ xử lý</span>
+                    <span class="stat-icon">⏳</span>
                 </div>
+                <div class="stat-value" id="statPending">0</div>
             </div>
             
-            <div class="stat-card stat-progress">
-                <div class="stat-icon">🔄</div>
-                <div class="stat-content">
-                    <h3 id="statInProgress">0</h3>
-                    <p>Đang làm</p>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-label">Đang làm</span>
+                    <span class="stat-icon">🔄</span>
                 </div>
+                <div class="stat-value" id="statInProgress">0</div>
             </div>
             
-            <div class="stat-card stat-completed">
-                <div class="stat-icon">✅</div>
-                <div class="stat-content">
-                    <h3 id="statCompleted">0</h3>
-                    <p>Hoàn thành</p>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-label">Hoàn thành</span>
+                    <span class="stat-icon">✅</span>
                 </div>
+                <div class="stat-value" id="statCompleted">0</div>
             </div>
         </div>
         
-        <!-- Task Management Section -->
-        <div class="task-section">
-            <div class="section-header">
-                <h2>Danh sách công việc</h2>
-                <button id="createTaskBtn" class="btn btn-primary">+ Tạo công việc mới</button>
+        <!-- Task Controls -->
+        <div class="task-controls">
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-status="ALL">Tất cả</button>
+                <button class="filter-btn" data-status="PENDING">Chờ xử lý</button>
+                <button class="filter-btn" data-status="IN_PROGRESS">Đang làm</button>
+                <button class="filter-btn" data-status="COMPLETED">Hoàn thành</button>
             </div>
-            
-            <!-- Filter Tabs -->
-            <div class="filter-tabs">
-                <button class="tab-btn active" data-status="ALL">Tất cả</button>
-                <button class="tab-btn" data-status="PENDING">Chờ xử lý</button>
-                <button class="tab-btn" data-status="IN_PROGRESS">Đang làm</button>
-                <button class="tab-btn" data-status="COMPLETED">Hoàn thành</button>
-            </div>
-            
-            <!-- Task List -->
-            <div id="taskList" class="task-list">
-                <div class="loading">Đang tải...</div>
+            <button id="createTaskBtn" class="btn btn-primary">+ Tạo công việc mới</button>
+        </div>
+        
+        <!-- Task List -->
+        <div id="taskList" class="tasks-grid">
+            <div class="loading-overlay">
+                <div class="spinner"></div>
             </div>
         </div>
     </div>
@@ -82,7 +79,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2 id="modalTitle">Tạo công việc mới</h2>
-                <span class="close">&times;</span>
+                <button class="close-btn">&times;</button>
             </div>
             
             <form id="taskForm">
@@ -90,19 +87,29 @@
                 
                 <div class="form-group">
                     <label for="taskTitle">Tiêu đề *</label>
-                    <input type="text" id="taskTitle" required maxlength="200" 
+                    <input type="text" id="taskTitle" class="form-control" required maxlength="200" 
                            placeholder="Nhập tiêu đề công việc">
                 </div>
                 
                 <div class="form-group">
                     <label for="taskDescription">Mô tả</label>
-                    <textarea id="taskDescription" rows="4" maxlength="1000" 
+                    <textarea id="taskDescription" class="form-control" rows="4" maxlength="1000" 
                               placeholder="Nhập mô tả chi tiết (tùy chọn)"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="taskStartDate">Ngày bắt đầu</label>
+                    <input type="datetime-local" id="taskStartDate" class="form-control">
+                </div>
+                
+                <div class="form-group">
+                    <label for="taskDeadline">Deadline</label>
+                    <input type="datetime-local" id="taskDeadline" class="form-control">
                 </div>
                 
                 <div id="taskFormError" class="error-message" style="display: none;"></div>
                 
-                <div class="modal-actions">
+                <div class="form-actions">
                     <button type="button" class="btn btn-secondary" id="cancelTaskBtn">Hủy</button>
                     <button type="submit" class="btn btn-primary">Lưu</button>
                 </div>

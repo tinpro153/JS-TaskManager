@@ -29,7 +29,9 @@ class SqlTaskRepository extends TaskRepository {
             user_id: task.getUserId(),
             title: task.getTitle(),
             description: task.getDescription(),
-            status: task.getStatus()
+            status: task.getStatus(),
+            start_date: task.getStartDate(),
+            deadline: task.getDeadline()
         });
         return this.toDomain(savedRow);
     }
@@ -67,10 +69,12 @@ class SqlTaskRepository extends TaskRepository {
     async update(task) {
         const pool = this.getPool();
         
-        // Update title/description
+        // Update title/description/dates
         let updatedRow = await TaskModel.update(pool, task.getId(), {
             title: task.getTitle(),
-            description: task.getDescription()
+            description: task.getDescription(),
+            start_date: task.getStartDate(),
+            deadline: task.getDeadline()
         });
 
         if (!updatedRow) {
@@ -120,7 +124,9 @@ class SqlTaskRepository extends TaskRepository {
             row.status,
             row.user_id.toLowerCase(), // Convert GUID to lowercase string
             row.created_at,
-            row.updated_at
+            row.updated_at,
+            row.start_date,
+            row.deadline
         );
     }
 }

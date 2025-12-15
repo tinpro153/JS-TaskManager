@@ -36,7 +36,7 @@ class TaskController {
      */
     async createTask(req, res) {
         try {
-            const { title, description } = req.body;
+            const { title, description, startDate, deadline } = req.body;
             const userId = req.user.userId; // From auth middleware
 
             if (!title) {
@@ -46,7 +46,13 @@ class TaskController {
                 });
             }
 
-            const inputDTO = new CreateTaskInputDTO(title, description, userId);
+            const inputDTO = new CreateTaskInputDTO(
+                title, 
+                description, 
+                userId, 
+                startDate ? new Date(startDate) : undefined,
+                deadline ? new Date(deadline) : undefined
+            );
             const outputDTO = await this.createTaskUseCase.execute(inputDTO);
 
             return res.status(201).json({
@@ -56,6 +62,8 @@ class TaskController {
                     title: outputDTO.title,
                     description: outputDTO.description,
                     status: outputDTO.status,
+                    startDate: outputDTO.startDate,
+                    deadline: outputDTO.deadline,
                     created_at: outputDTO.createdAt
                 },
                 message: 'Task created successfully'
@@ -78,9 +86,24 @@ class TaskController {
             const inputDTO = new GetTasksInputDTO(userId, status);
             const outputDTO = await this.getTasksUseCase.execute(inputDTO);
 
+            // Transform taskId to id for frontend compatibility
+            const tasks = outputDTO.tasks.map(task => ({
+                id: task.taskId,
+                title: task.title,
+                description: task.description,
+                status: task.status,
+                userId: task.userId,
+                createdAt: task.createdAt,
+                updatedAt: task.updatedAt,
+                startDate: task.startDate,
+                deadline: task.deadline,
+                progress: task.progress,
+                isOverdue: task.isOverdue
+            }));
+
             return res.status(200).json({
                 success: true,
-                tasks: outputDTO.tasks,
+                tasks: tasks,
                 count: outputDTO.count
             });
 
@@ -109,7 +132,11 @@ class TaskController {
                     description: outputDTO.description,
                     status: outputDTO.status,
                     created_at: outputDTO.createdAt,
-                    updated_at: outputDTO.updatedAt
+                    updated_at: outputDTO.updatedAt,
+                    startDate: outputDTO.startDate,
+                    deadline: outputDTO.deadline,
+                    progress: outputDTO.progress,
+                    isOverdue: outputDTO.isOverdue
                 }
             });
 
@@ -126,9 +153,17 @@ class TaskController {
         try {
             const taskId = req.params.id;
             const userId = req.user.userId;
-            const { title, description, status } = req.body;
+            const { title, description, status, startDate, deadline } = req.body;
 
-            const inputDTO = new UpdateTaskInputDTO(taskId, title, description, status, userId);
+            const inputDTO = new UpdateTaskInputDTO(
+                taskId, 
+                title, 
+                description, 
+                status, 
+                userId,
+                startDate ? new Date(startDate) : undefined,
+                deadline ? new Date(deadline) : undefined
+            );
             const outputDTO = await this.updateTaskUseCase.execute(inputDTO);
 
             return res.status(200).json({
@@ -138,7 +173,9 @@ class TaskController {
                     title: outputDTO.title,
                     description: outputDTO.description,
                     status: outputDTO.status,
-                    updated_at: outputDTO.updatedAt
+                    updated_at: outputDTO.updatedAt,
+                    startDate: outputDTO.startDate,
+                    deadline: outputDTO.deadline
                 },
                 message: 'Task updated successfully'
             });

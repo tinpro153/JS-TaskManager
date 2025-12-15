@@ -289,3 +289,5 @@ PRINT '============================================';
 PRINT 'SETUP COMPLETE - Ready to use!';
 PRINT '============================================';
 GO
+
+ALTER TABLE Tasks ADD start_date DATETIME2 DEFAULT GETDATE(); ALTER TABLE Tasks ADD deadline DATETIME2 NULL;

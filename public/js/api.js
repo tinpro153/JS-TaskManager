@@ -98,11 +98,13 @@ class API {
     /**
      * Task APIs
      */
-    static async createTask(title, description) {
+    static async createTask(taskData) {
+        // taskData can be an object {title, description, startDate, deadline} or just title/description for backward compatibility
+        const data = typeof taskData === 'object' && !Array.isArray(taskData) ? taskData : { title: arguments[0], description: arguments[1] };
         return this.request('/tasks', {
             method: 'POST',
             headers: this.getAuthHeaders(),
-            body: JSON.stringify({ title, description })
+            body: JSON.stringify(data)
         });
     }
 
@@ -121,11 +123,13 @@ class API {
         });
     }
 
-    static async updateTask(taskId, title, description) {
+    static async updateTask(taskId, taskData) {
+        // taskData can be an object {title, description, startDate, deadline} or just title/description for backward compatibility
+        const data = typeof taskData === 'object' && !Array.isArray(taskData) ? taskData : { title: arguments[1], description: arguments[2] };
         return this.request(`/tasks/${taskId}`, {
             method: 'PUT',
             headers: this.getAuthHeaders(),
-            body: JSON.stringify({ title, description })
+            body: JSON.stringify(data)
         });
     }
 

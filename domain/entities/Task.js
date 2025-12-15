@@ -6,15 +6,20 @@ const { TaskStatus } = require('../valueobjects/TaskStatus');
  * NO framework dependencies allowed
  */
 class Task {
-    constructor(title, description, userId) {
+    constructor(title, description, userId, startDate = null, deadline = null) {
         this.validateTitle(title);
         this.validateUserId(userId);
+        if (deadline) {
+            this.validateDeadline(deadline, startDate);
+        }
         
         this.id = null; // Will be set by repository
         this.title = title.trim();
         this.description = description ? description.trim() : '';
         this.status = TaskStatus.PENDING; // Default status
         this.userId = userId;
+        this.startDate = startDate || new Date();
+        this.deadline = deadline;
         this.createdAt = new Date();
         this.updatedAt = new Date();
     }
@@ -22,13 +27,15 @@ class Task {
     /**
      * Reconstruct task from database (skip validation)
      */
-    static reconstruct(id, title, description, status, userId, createdAt, updatedAt) {
+    static reconstruct(id, title, description, status, userId, startDate, deadline, createdAt, updatedAt) {
         const task = Object.create(Task.prototype);
         task.id = id;
         task.title = title;
         task.description = description;
         task.status = status;
         task.userId = userId;
+        task.startDate = startDate;
+        task.deadline = deadline;
         task.createdAt = createdAt;
         task.updatedAt = updatedAt;
         return task;
@@ -61,6 +68,22 @@ class Task {
         }
     }
 
+    validateDeadline(deadline, startDate = null) {
+        if (!deadline) return;
+        
+        const deadlineDate = new Date(deadline);
+        if (isNaN(deadlineDate.getTime())) {
+            throw DomainException.validationError('Invalid deadline date format');
+        }
+        
+        if (startDate) {
+            const start = new Date(startDate);
+            if (deadlineDate < start) {
+                throw DomainException.validationError('Deadline cannot be before start date');
+            }
+        }
+    }
+
     // Business methods
     updateTitle(newTitle) {
         this.validateTitle(newTitle);
@@ -87,7 +110,7 @@ class Task {
         this.updatedAt = new Date();
     }
 
-    update(title, description, status) {
+    update(title, description, status, startDate, deadline) {
         if (title !== undefined && title !== null) {
             this.updateTitle(title);
         }
@@ -96,6 +119,34 @@ class Task {
         }
         if (status !== undefined && status !== null) {
             this.updateStatus(status);
+        }
+        if (startDate !== undefined && startDate !== null) {
+            this.updateStartDate(startDate);
+        }
+        if (deadline !== undefined) {
+            this.updateDeadline(deadline);
+        }
+        this.updatedAt = new Date();
+    }
+
+    updateStartDate(newStartDate) {
+        const start = new Date(newStartDate);
+        if (isNaN(start.getTime())) {
+            throw DomainException.validationError('Invalid start date format');
+        }
+        if (this.deadline && start > new Date(this.deadline)) {
+            throw DomainException.validationError('Start date cannot be after deadline');
+        }
+        this.startDate = start;
+        this.updatedAt = new Date();
+    }
+
+    updateDeadline(newDeadline) {
+        if (newDeadline) {
+            this.validateDeadline(newDeadline, this.startDate);
+            this.deadline = new Date(newDeadline);
+        } else {
+            this.deadline = null;
         }
         this.updatedAt = new Date();
     }
@@ -169,6 +220,43 @@ class Task {
         return this.updatedAt;
     }
 
+    getStartDate() {
+        return this.startDate;
+    }
+
+    getDeadline() {
+        return this.deadline;
+    }
+
+    // Business method: Calculate progress based on time
+    getProgressPercentage() {
+        if (!this.deadline) return null;
+        
+        if (this.status === TaskStatus.COMPLETED) {
+            return 100;
+        }
+        
+        const now = new Date();
+        const start = new Date(this.startDate);
+        const end = new Date(this.deadline);
+        
+        if (now >= end) return 100; // Overdue
+        if (now <= start) return 0;
+        
+        const totalTime = end - start;
+        const elapsedTime = now - start;
+        
+        return Math.round((elapsedTime / totalTime) * 100);
+    }
+
+    // Business method: Check if task is overdue
+    isOverdue() {
+        if (!this.deadline || this.status === TaskStatus.COMPLETED) {
+            return false;
+        }
+        return new Date() > new Date(this.deadline);
+    }
+
     // For serialization
     toObject() {
         return {
@@ -177,6 +265,8 @@ class Task {
             description: this.description,
             status: this.status,
             userId: this.userId,
+            startDate: this.startDate,
+            deadline: this.deadline,
             createdAt: this.createdAt,
             updatedAt: this.updatedAt
         };

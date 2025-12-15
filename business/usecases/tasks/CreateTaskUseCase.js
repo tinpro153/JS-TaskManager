@@ -26,7 +26,9 @@ class CreateTaskUseCase {
         const task = new Task(
             inputDTO.title,
             inputDTO.description,
-            inputDTO.userId
+            inputDTO.userId,
+            inputDTO.startDate,
+            inputDTO.deadline
         );
 
         // Step 3: Persist

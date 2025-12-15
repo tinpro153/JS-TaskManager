@@ -12,6 +12,8 @@ class TaskModel {
      * - title: NVARCHAR(200)
      * - description: NVARCHAR(1000)
      * - status: NVARCHAR(20) (PENDING, IN_PROGRESS, COMPLETED)
+     * - start_date: DATETIME2
+     * - deadline: DATETIME2
      * - created_at: DATETIME2
      * - updated_at: DATETIME2
      */
@@ -21,17 +23,19 @@ class TaskModel {
     /**
      * Create a new task
      */
-    static async create(pool, { user_id, title, description, status = 'PENDING' }) {
+    static async create(pool, { user_id, title, description, status = 'PENDING', start_date, deadline }) {
         const request = pool.request();
         const result = await request
             .input('user_id', sql.UniqueIdentifier, user_id)
             .input('title', sql.NVarChar(200), title)
             .input('description', sql.NVarChar(1000), description || '')
             .input('status', sql.NVarChar(20), status)
+            .input('start_date', sql.DateTime2, start_date || new Date())
+            .input('deadline', sql.DateTime2, deadline || null)
             .query(`
-                INSERT INTO ${this.TABLE_NAME} (user_id, title, description, status)
+                INSERT INTO ${this.TABLE_NAME} (user_id, title, description, status, start_date, deadline)
                 OUTPUT INSERTED.*
-                VALUES (@user_id, @title, @description, @status)
+                VALUES (@user_id, @title, @description, @status, @start_date, @deadline)
             `);
         return result.recordset[0];
     }
@@ -81,19 +85,42 @@ class TaskModel {
     /**
      * Update task
      */
-    static async update(pool, id, { title, description }) {
+    static async update(pool, id, { title, description, start_date, deadline }) {
         const request = pool.request();
-        const result = await request
-            .input('id', sql.UniqueIdentifier, id)
-            .input('title', sql.NVarChar(200), title)
-            .input('description', sql.NVarChar(1000), description || '')
-            .query(`
-                UPDATE ${this.TABLE_NAME}
-                SET title = @title, description = @description
-                OUTPUT INSERTED.*
-                WHERE id = @id
-            `);
-        return result.recordset[0] || null;
+        
+        // Build dynamic update query
+        let query = `UPDATE ${this.TABLE_NAME} SET `;
+        const updates = [];
+        
+        if (title !== undefined) {
+            request.input('title', sql.NVarChar(200), title);
+            updates.push('title = @title');
+        }
+        if (description !== undefined) {
+            request.input('description', sql.NVarChar(1000), description || '');
+            updates.push('description = @description');
+        }
+        if (start_date !== undefined) {
+            request.input('start_date', sql.DateTime2, start_date);
+            updates.push('start_date = @start_date');
+        }
+        if (deadline !== undefined) {
+            request.input('deadline', sql.DateTime2, deadline);
+            updates.push('deadline = @deadline');
+        }
+        
+        if (updates.length === 0) {
+            return await this.findById(pool, id);
+        }
+        
+        query += updates.join(', ') + ' WHERE id = @id';
+        
+        // UPDATE without OUTPUT due to trigger conflict
+        request.input('id', sql.UniqueIdentifier, id);
+        await request.query(query);
+        
+        // Fetch updated record
+        return await this.findById(pool, id);
     }
 
     /**
@@ -101,16 +128,18 @@ class TaskModel {
      */
     static async updateStatus(pool, id, status) {
         const request = pool.request();
-        const result = await request
+        // UPDATE without OUTPUT due to trigger conflict
+        await request
             .input('id', sql.UniqueIdentifier, id)
             .input('status', sql.NVarChar(20), status)
             .query(`
                 UPDATE ${this.TABLE_NAME}
                 SET status = @status
-                OUTPUT INSERTED.*
                 WHERE id = @id
             `);
-        return result.recordset[0] || null;
+        
+        // Fetch updated record
+        return await this.findById(pool, id);
     }
 
     /**
