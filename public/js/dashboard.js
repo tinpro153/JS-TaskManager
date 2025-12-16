@@ -1,55 +1,21 @@
-/**
- * Dashboard Page JavaScript - UNIFIED VERSION
- * Frontend ONLY renders data, NO business logic
- * 
- * CARD VIEW: Dashboard (no params) shows all tasks as cards
- * TABLE VIEW: Status filters (?status=XXX) show filtered tasks as table
- * 
- * ALL logic has been moved to backend:
- * - Date formatting → backend
- * - Status text localization → backend
- * - Progress color calculation → backend
- * - Overdue message calculation → backend
- * - Action permissions → backend
- * - Statistics formatting → backend
- * - Insights generation → backend
- * 
- * Frontend responsibilities:
- * ✅ Call API
- * ✅ Render HTML (CARD or TABLE based on URL)
- * ✅ Handle user events (click, submit)
- * ✅ Navigation
- * ✅ Show notifications
- * 
- * @author Clean Architecture Team
- * @version 4.0.0 - Unified Dashboard (Card + Table)
- */
-
-// Global state
 let currentFilter = 'ALL';
 let currentEditingTaskId = null;
 let allTasks = [];
 let viewMode = 'card'; // 'card' or 'table'
 
-/**
- * Initialize dashboard on page load
- */
 document.addEventListener('DOMContentLoaded', async () => {
     if (!API.getToken()) {
         window.location.href = '/login.html';
         return;
     }
 
-    // Get status from URL query parameter
     const urlParams = new URLSearchParams(window.location.search);
     const statusParam = urlParams.get('status');
     
     if (statusParam) {
-        // Has status param -> TABLE VIEW
         currentFilter = statusParam;
         viewMode = 'table';
     } else {
-        // No status param -> CARD VIEW (Dashboard)
         currentFilter = 'ALL';
         viewMode = 'card';
     }
@@ -58,16 +24,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupEventListeners();
 });
 
-/**
- * Initialize dashboard components
- */
 async function init() {
     try {
-        // Load sidebar component with appropriate active item
         const sidebarIdentifier = viewMode === 'card' ? 'dashboard' : currentFilter;
         await window.Sidebar.load('#sidebarContainer', sidebarIdentifier);
         
-        // Show/hide appropriate UI elements based on view mode
         setupViewMode();
         
         await loadUserInfo();
@@ -82,9 +43,6 @@ async function init() {
     }
 }
 
-/**
- * Setup view mode - Show/hide appropriate UI elements
- */
 function setupViewMode() {
     const pageHeader = document.querySelector('.page-header');
     const pageActionsBar = document.querySelector('.page-actions-bar');
@@ -94,7 +52,6 @@ function setupViewMode() {
     const tableContainer = document.querySelector('.table-container');
     
     if (viewMode === 'card') {
-        // CARD VIEW (Dashboard)
         if (pageHeader) pageHeader.style.display = 'none';
         if (pageActionsBar) pageActionsBar.style.display = 'flex';
         if (insightsContainer) insightsContainer.style.display = 'grid';
@@ -102,7 +59,6 @@ function setupViewMode() {
         if (tasksList) tasksList.style.display = 'grid';
         if (tableContainer) tableContainer.style.display = 'none';
     } else {
-        // TABLE VIEW (Status filters)
         if (pageHeader) pageHeader.style.display = 'flex';
         if (pageActionsBar) pageActionsBar.style.display = 'none';
         if (insightsContainer) insightsContainer.style.display = 'none';
@@ -110,7 +66,6 @@ function setupViewMode() {
         if (tasksList) tasksList.style.display = 'none';
         if (tableContainer) tableContainer.style.display = 'block';
         
-        // Update page title based on status
         const statusNames = {
             'ALL': 'Tổng công việc',
             'SCHEDULED': 'Đang chờ',
@@ -126,9 +81,6 @@ function setupViewMode() {
     }
 }
 
-/**
- * Setup all event listeners
- */
 function setupEventListeners() {
     document.getElementById('logoutBtn').addEventListener('click', handleLogout);
     
@@ -152,7 +104,6 @@ function setupEventListeners() {
         }
     });
 
-    // Table-specific event listeners (only if in table mode)
     if (viewMode === 'table') {
         const filterTitle = document.getElementById('filterTitle');
         const sortOrder = document.getElementById('sortOrder');
@@ -167,9 +118,6 @@ function setupEventListeners() {
     }
 }
 
-/**
- * Load user info
- */
 async function loadUserInfo() {
     try {
         const response = await API.getCurrentUser();
@@ -183,21 +131,14 @@ async function loadUserInfo() {
     }
 }
 
-/**
- * Load statistics - CALLS DISPLAY ENDPOINT
- * Backend returns FORMATTED data with INSIGHTS
- * Updates sidebar badges
- */
 async function loadStatistics() {
     try {
         const response = await API.getStatisticsForDisplay();
         if (response.success && response.statistics) {
             const stats = response.statistics;
 
-            // Update sidebar badges via Sidebar component
             window.Sidebar.updateBadges(stats);
 
-            // Render insights (NEW - from backend)
             renderInsights(stats.insights);
         }
     } catch (error) {
@@ -205,10 +146,6 @@ async function loadStatistics() {
     }
 }
 
-/**
- * Render insights from backend
- * Frontend ONLY renders, NO calculation
- */
 function renderInsights(insights) {
     if (!insights || insights.length === 0) return;
 
@@ -228,14 +165,8 @@ function renderInsights(insights) {
     });
 }
 
-/**
- * Load tasks - CALLS DISPLAY ENDPOINT
- * Backend returns FULLY ENRICHED data with ALL display properties
- * Renders in CARD or TABLE format based on viewMode
- */
 async function loadTasks() {
     try {
-        // Call DISPLAY endpoint - backend returns enriched data
         const response = await API.getTaskListForDisplay(currentFilter);
 
         if (!response.success) {
@@ -267,9 +198,6 @@ async function loadTasks() {
     }
 }
 
-/**
- * Render tasks as CARDS (Dashboard view)
- */
 function renderTasksAsCards(tasks, emptyMessage) {
     const tasksList = document.getElementById('tasksList');
     if (!tasksList) return;
@@ -283,11 +211,6 @@ function renderTasksAsCards(tasks, emptyMessage) {
     attachTaskActionListeners();
 }
 
-/**
- * Create HTML card for a task
- * Frontend ONLY renders - NO calculations!
- * ALL data (colors, formatting, permissions) comes from backend
- */
 function createTaskCard(task) {
     const quickCompleteBtn = task.canComplete ? 
         `<button class="quick-complete-btn" data-id="${task.id}" data-status="COMPLETED">✓ Hoàn thành</button>` : '';
@@ -330,9 +253,6 @@ function createTaskCard(task) {
     `;
 }
 
-/**
- * Render tasks as TABLE (Status filter views)
- */
 function renderTasksAsTable(tasks, emptyMessage) {
     const tableBody = document.getElementById('taskTableBody');
     if (!tableBody) return;
@@ -346,11 +266,6 @@ function renderTasksAsTable(tasks, emptyMessage) {
     attachTaskActionListeners();
 }
 
-/**
- * Create HTML table row for a task
- * Frontend ONLY renders - NO calculations!
- * ALL data comes from backend
- */
 function createTaskRow(task) {
     const descriptionShort = task.description ? 
         (task.description.length > 50 ? task.description.substring(0, 50) + '...' : task.description) : 
@@ -378,9 +293,6 @@ function createTaskRow(task) {
     `;
 }
 
-/**
- * Filter and sort tasks locally (TABLE mode only - client-side search/sort)
- */
 function filterTasksLocally() {
     if (viewMode !== 'table') return;
 
@@ -394,7 +306,6 @@ function filterTasksLocally() {
     
     let filteredTasks = [...allTasks];
     
-    // Filter by title
     if (searchText) {
         filteredTasks = filteredTasks.filter(task => 
             task.title.toLowerCase().includes(searchText) ||
@@ -402,7 +313,6 @@ function filterTasksLocally() {
         );
     }
     
-    // Sort
     filteredTasks.sort((a, b) => {
         if (sortValue === 'newest') {
             return new Date(b.createdAt) - new Date(a.createdAt);
@@ -419,9 +329,6 @@ function filterTasksLocally() {
     renderTasksAsTable(filteredTasks);
 }
 
-/**
- * Attach event listeners to task action buttons
- */
 function attachTaskActionListeners() {
     document.querySelectorAll('.btn-edit').forEach(btn => {
         btn.addEventListener('click', (e) => {
@@ -446,9 +353,6 @@ function attachTaskActionListeners() {
     });
 }
 
-/**
- * Format date helper (fallback if backend doesn't provide formatted date)
- */
 function formatDate(dateString) {
     if (!dateString) return 'Không có';
     const d = new Date(dateString);
@@ -461,16 +365,12 @@ function formatDate(dateString) {
     });
 }
 
-/**
- * Open task modal (create or edit)
- */
 function openTaskModal(taskData = null) {
     const modal = document.getElementById('taskModal');
     const modalTitle = document.getElementById('modalTitle');
     const taskForm = document.getElementById('taskForm');
 
     if (taskData) {
-        // Edit mode
         modalTitle.textContent = 'Chỉnh sửa công việc';
         currentEditingTaskId = taskData.id;
         
@@ -480,13 +380,11 @@ function openTaskModal(taskData = null) {
         document.getElementById('taskStartDate').value = formatDateForInput(taskData.startDate);
         document.getElementById('taskDeadline').value = taskData.deadline ? formatDateForInput(taskData.deadline) : '';
     } else {
-        // Create mode
         modalTitle.textContent = 'Tạo công việc mới';
         taskForm.reset();
         document.getElementById('taskId').value = '';
         currentEditingTaskId = null;
         
-        // Auto-fill startDate with current datetime
         const now = new Date();
         const localDatetime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
             .toISOString()
@@ -497,18 +395,12 @@ function openTaskModal(taskData = null) {
     modal.classList.add('active');
 }
 
-/**
- * Close task modal
- */
 function closeTaskModal() {
     const modal = document.getElementById('taskModal');
     modal.classList.remove('active');
     currentEditingTaskId = null;
 }
 
-/**
- * Handle task form submit
- */
 async function handleTaskFormSubmit(e) {
     e.preventDefault();
 
@@ -532,11 +424,9 @@ async function handleTaskFormSubmit(e) {
 
     try {
         if (taskId) {
-            // Update existing task
             await API.updateTask(taskId, taskData);
             showNotification('Cập nhật công việc thành công', 'success');
         } else {
-            // Create new task
             await API.createTask(taskData);
             showNotification('Tạo công việc thành công', 'success');
         }
@@ -549,9 +439,6 @@ async function handleTaskFormSubmit(e) {
     }
 }
 
-/**
- * Handle edit task
- */
 async function handleEditTask(taskId) {
     try {
         const response = await API.getTaskById(taskId);
@@ -563,9 +450,6 @@ async function handleEditTask(taskId) {
     }
 }
 
-/**
- * Handle delete task
- */
 async function handleDeleteTask(taskId) {
     if (!confirm('Bạn có chắc chắn muốn xóa công việc này?')) {
         return;
@@ -581,9 +465,6 @@ async function handleDeleteTask(taskId) {
     }
 }
 
-/**
- * Handle status change
- */
 async function handleStatusChange(taskId, newStatus) {
     try {
         await API.changeTaskStatus(taskId, newStatus);
@@ -595,9 +476,6 @@ async function handleStatusChange(taskId, newStatus) {
     }
 }
 
-/**
- * Handle logout
- */
 async function handleLogout() {
     if (!confirm('Bạn có chắc chắn muốn đăng xuất?')) {
         return;
@@ -613,18 +491,12 @@ async function handleLogout() {
     }
 }
 
-/**
- * Escape HTML to prevent XSS
- */
 function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
 }
 
-/**
- * Show toast notification
- */
 function showNotification(message, type = 'success') {
     const existing = document.querySelector('.toast');
     if (existing) {
@@ -642,9 +514,6 @@ function showNotification(message, type = 'success') {
     }, 3000);
 }
 
-/**
- * Format Date object for HTML datetime-local input
- */
 function formatDateForInput(date) {
     const d = new Date(date);
     const year = d.getFullYear();

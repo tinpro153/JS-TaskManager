@@ -1,6 +1,3 @@
-/**
- * Register Page JavaScript
- */
 
 document.addEventListener('DOMContentLoaded', () => {
     const registerForm = document.getElementById('registerForm');
@@ -21,7 +18,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const password = document.getElementById('password').value;
         const confirmPassword = document.getElementById('confirmPassword').value;
 
-        // Validation
         if (!username || !email || !password || !confirmPassword) {
             Utils.showError('errorMessage', 'Vui lòng nhập đầy đủ thông tin');
             return;
@@ -37,7 +33,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Disable submit button
         const submitBtn = registerForm.querySelector('button[type="submit"]');
         submitBtn.disabled = true;
         submitBtn.textContent = 'Đang đăng ký...';
@@ -48,7 +43,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (response.success) {
                 Utils.showSuccess('successMessage', 'Đăng ký thành công! Đang chuyển đến trang đăng nhập...');
                 
-                // Clear form
                 registerForm.reset();
 
                 // Redirect to login after 2 seconds

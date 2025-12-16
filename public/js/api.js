@@ -1,55 +1,24 @@
-/**
- * API Service - Centralized API calls
- * Frontend JavaScript
- */
-
 const API_BASE_URL = '/api';
 
 class API {
-    /**
-     * Get auth token from localStorage
-     * @returns {string|null} JWT token or null if not found
-     */
+
     static getToken() {
         return localStorage.getItem('token');
     }
 
-    /**
-     * Set auth token to localStorage
-     * @param {string} token - JWT authentication token
-     */
     static setToken(token) {
         localStorage.setItem('token', token);
     }
 
-    /**
-     * Remove auth token from localStorage (logout)
-     */
     static removeToken() {
         localStorage.removeItem('token');
     }
 
-    /**
-     * Get authorization headers for authenticated requests
-     * @returns {Object} Headers object with Authorization header if token exists
-     * @example
-     * // Returns { 'Authorization': 'Bearer eyJhbGci...' }
-     */
     static getAuthHeaders() {
         const token = this.getToken();
         return token ? { 'Authorization': `Bearer ${token}` } : {};
     }
 
-    /**
-     * Make HTTP request to API endpoint with automatic retry logic
-     * @param {string} endpoint - API endpoint path (e.g., '/tasks', '/auth/login')
-     * @param {Object} options - Fetch options (method, body, headers)
-     * @param {number} retries - Maximum number of retries for network errors (default: 3)
-     * @returns {Promise<Object>} API response data
-     * @throws {Error} When request fails or response is not ok
-     * @example
-     * const data = await API.request('/tasks', { method: 'GET', headers: API.getAuthHeaders() });
-     */
     static async request(endpoint, options = {}, retries = 3) {
         const url = `${API_BASE_URL}${endpoint}`;
         const headers = {
@@ -101,21 +70,6 @@ class API {
         throw lastError;
     }
 
-    /**
-     * Authentication APIs
-     */
-    
-    /**
-     * Register a new user account
-     * @param {string} username - Username (3-50 chars, alphanumeric + underscore)
-     * @param {string} email - Email address (valid email format)
-     * @param {string} password - Password (min 6 chars)
-     * @returns {Promise<Object>} Response with success flag and user data
-     * @throws {Error} When validation fails or username/email exists
-     * @example
-     * const response = await API.register('johndoe', 'john@example.com', 'password123');
-     * // { success: true, user: { id, username, email }, message: 'Registration successful' }
-     */
     static async register(username, email, password) {
         return this.request('/auth/register', {
             method: 'POST',
@@ -123,16 +77,6 @@ class API {
         });
     }
 
-    /**
-     * Login to the system
-     * @param {string} email - Email address or username
-     * @param {string} password - User password
-     * @returns {Promise<Object>} Response with token and user data
-     * @throws {Error} When credentials are invalid
-     * @example
-     * const response = await API.login('john@example.com', 'password123');
-     * // { success: true, token: 'eyJhbGci...', user: { id, username, email } }
-     */
     static async login(email, password) {
         return this.request('/auth/login', {
             method: 'POST',
@@ -140,14 +84,6 @@ class API {
         });
     }
 
-    /**
-     * Get current authenticated user information
-     * @returns {Promise<Object>} Current user data
-     * @throws {Error} When token is invalid or expired
-     * @example
-     * const response = await API.getCurrentUser();
-     * // { success: true, user: { id, username, email } }
-     */
     static async getCurrentUser() {
         return this.request('/auth/me', {
             method: 'GET',
@@ -155,13 +91,6 @@ class API {
         });
     }
 
-    /**
-     * Logout from the system
-     * @returns {Promise<Object>} Logout confirmation
-     * @example
-     * const response = await API.logout();
-     * // { success: true, message: 'Logout successful' }
-     */
     static async logout() {
         return this.request('/auth/logout', {
             method: 'POST',
@@ -169,28 +98,6 @@ class API {
         });
     }
 
-    /**
-     * Task APIs
-     */
-    
-    /**
-     * Create a new task
-     * @param {Object|string} taskData - Task data object or title string (for backward compatibility)
-     * @param {string} taskData.title - Task title (required, max 200 chars)
-     * @param {string} [taskData.description] - Task description (optional, max 1000 chars)
-     * @param {string} [taskData.startDate] - Start date ISO string (optional, default: now)
-     * @param {string} [taskData.deadline] - Deadline ISO string (optional, must be after startDate)
-     * @returns {Promise<Object>} Response with created task including progress and isOverdue
-     * @throws {Error} When validation fails or deadline < startDate
-     * @example
-     * const response = await API.createTask({
-     *   title: 'Hoàn thành báo cáo',
-     *   description: 'Báo cáo tháng 12',
-     *   startDate: '2025-01-01T09:00:00Z',
-     *   deadline: '2025-01-31T18:00:00Z'
-     * });
-     * // { success: true, task: { id, title, ..., progress: 0, isOverdue: false } }
-     */
     static async createTask(taskData) {
         // taskData can be an object {title, description, startDate, deadline} or just title/description for backward compatibility
         const data = typeof taskData === 'object' && !Array.isArray(taskData) ? taskData : { title: arguments[0], description: arguments[1] };
@@ -201,14 +108,6 @@ class API {
         });
     }
 
-    /**
-     * Get all tasks for current user
-     * @param {string|null} [status=null] - Filter by status (SCHEDULED, PENDING, IN_PROGRESS, COMPLETED, FAILED, CANCELLED)
-     * @returns {Promise<Object>} Response with tasks array containing progress/isOverdue
-     * @example
-     * const response = await API.getTasks('PENDING');
-     * // { success: true, tasks: [{id, title, progress: 25.5, isOverdue: false, ...}], count: 3 }
-     */
     static async getTasks(status = null) {
         const queryString = status ? `?status=${status}` : '';
         return this.request(`/tasks${queryString}`, {
@@ -217,15 +116,6 @@ class API {
         });
     }
 
-    /**
-     * Get task details by ID
-     * @param {string} taskId - Task UUID
-     * @returns {Promise<Object>} Response with task data including progress/isOverdue
-     * @throws {Error} When task not found or unauthorized
-     * @example
-     * const response = await API.getTaskById('507f1f77bcf86cd799439012');
-     * // { success: true, task: { id, title, progress: 65.5, isOverdue: false, ... } }
-     */
     static async getTaskById(taskId) {
         return this.request(`/tasks/${taskId}`, {
             method: 'GET',
@@ -233,23 +123,6 @@ class API {
         });
     }
 
-    /**
-     * Update task information
-     * @param {string} taskId - Task UUID
-     * @param {Object|string} taskData - Task data object or title string (for backward compatibility)
-     * @param {string} [taskData.title] - New task title (optional, max 200 chars)
-     * @param {string} [taskData.description] - New description (optional, max 1000 chars)
-     * @param {string} [taskData.startDate] - New start date ISO string (optional)
-     * @param {string} [taskData.deadline] - New deadline ISO string (optional, must be after startDate)
-     * @returns {Promise<Object>} Response with updated task including recalculated progress
-     * @throws {Error} When task not found, unauthorized, or validation fails
-     * @example
-     * const response = await API.updateTask('507f...', {
-     *   title: 'Updated title',
-     *   deadline: '2025-02-15T18:00:00Z'
-     * });
-     * // { success: true, task: { id, ..., progress: 15.3, isOverdue: false } }
-     */
     static async updateTask(taskId, taskData) {
         // taskData can be an object {title, description, startDate, deadline} or just title/description for backward compatibility
         const data = typeof taskData === 'object' && !Array.isArray(taskData) ? taskData : { title: arguments[1], description: arguments[2] };
@@ -260,15 +133,6 @@ class API {
         });
     }
 
-    /**
-     * Delete a task
-     * @param {string} taskId - Task UUID
-     * @returns {Promise<Object>} Deletion confirmation
-     * @throws {Error} When task not found or unauthorized
-     * @example
-     * const response = await API.deleteTask('507f1f77bcf86cd799439012');
-     * // { success: true, message: 'Task deleted successfully' }
-     */
     static async deleteTask(taskId) {
         return this.request(`/tasks/${taskId}`, {
             method: 'DELETE',
@@ -276,16 +140,6 @@ class API {
         });
     }
 
-    /**
-     * Change task status
-     * @param {string} taskId - Task UUID
-     * @param {string} status - New status (PENDING, IN_PROGRESS, COMPLETED) - Note: FAILED is auto-assigned only
-     * @returns {Promise<Object>} Response with updated task including progress/isOverdue
-     * @throws {Error} When business rule violated (e.g., COMPLETED → PENDING)
-     * @example
-     * const response = await API.changeTaskStatus('507f...', 'COMPLETED');
-     * // { success: true, task: { id, status: 'COMPLETED', progress: 100, isOverdue: false } }
-     */
     static async changeTaskStatus(taskId, status) {
         return this.request(`/tasks/${taskId}/status`, {
             method: 'PATCH',
@@ -294,14 +148,6 @@ class API {
         });
     }
 
-    /**
-     * Get task statistics for current user
-     * @returns {Promise<Object>} Response with task counts and completion rate
-     * @example
-     * const response = await API.getStatistics();
-     * // { success: true, totalTasks: 10, pendingTasks: 3, inProgressTasks: 2, 
-     * //   completedTasks: 5, completionRate: 50 }
-     */
     static async getStatistics() {
         return this.request('/tasks/statistics', {
             method: 'GET',
@@ -309,16 +155,6 @@ class API {
         });
     }
 
-    // ============================================================================
-    // DISPLAY ENDPOINTS (NEW - Backend handles ALL presentation logic)
-    // ============================================================================
-
-    /**
-     * Get task with full display data (formatted dates, colors, permissions, etc.)
-     * Backend returns EVERYTHING needed for rendering - NO client-side calculations!
-     * @param {string} taskId - Task UUID
-     * @returns {Promise<Object>} Task with display enrichment
-     */
     static async getTaskForDisplay(taskId) {
         return this.request(`/tasks/${taskId}/display`, {
             method: 'GET',
@@ -326,12 +162,6 @@ class API {
         });
     }
 
-    /**
-     * Get task list with full display enrichment
-     * Backend returns fully-processed data ready for rendering
-     * @param {string|null} statusFilter - Optional status filter (ALL | SCHEDULED | IN_PROGRESS | COMPLETED | FAILED | CANCELLED)
-     * @returns {Promise<Object>} Tasks array with display data, count, filter info, empty message
-     */
     static async getTaskListForDisplay(statusFilter = null) {
         let endpoint = '/tasks/display';
         if (statusFilter && statusFilter !== 'ALL') {
@@ -343,11 +173,6 @@ class API {
         });
     }
 
-    /**
-     * Get statistics with formatting and actionable insights
-     * Backend returns formatted strings AND business insights
-     * @returns {Promise<Object>} Statistics with formatting and insights
-     */
     static async getStatisticsForDisplay() {
         return this.request('/tasks/statistics/display', {
             method: 'GET',
@@ -356,9 +181,6 @@ class API {
     }
 }
 
-/**
- * Utility functions
- */
 const Utils = {
     showError(elementId, message) {
         const element = document.getElementById(elementId);
@@ -383,15 +205,6 @@ const Utils = {
         }
     },
 
-    // ============================================
-    // DEPRECATED: These functions are no longer needed
-    // Backend now handles ALL formatting and localization
-    // ============================================
-    
-    /**
-     * @deprecated Use backend display endpoints instead
-     * Backend returns formatted dates in response
-     */
     formatDate(dateString) {
         const date = new Date(dateString);
         return date.toLocaleDateString('vi-VN', {
@@ -403,10 +216,6 @@ const Utils = {
         });
     },
 
-    /**
-     * @deprecated Use backend display endpoints instead
-     * Backend returns statusText in response
-     */
     getStatusText(status) {
         const statusMap = {
             'PENDING': 'Chờ xử lý',
