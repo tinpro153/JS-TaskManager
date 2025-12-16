@@ -4,6 +4,8 @@ const { DeleteTaskInputDTO, DeleteTaskOutputDTO } = require('../../dto/DeleteTas
 /**
  * Delete Task Use Case
  * Orchestrates task deletion with authorization
+ * NOTE: This is now a SOFT DELETE (Cancel) operation
+ * Task status changes to CANCELLED instead of being deleted from database
  */
 class DeleteTaskUseCase {
     constructor(taskRepository) {
@@ -11,7 +13,7 @@ class DeleteTaskUseCase {
     }
 
     /**
-     * Execute task deletion
+     * Execute task deletion (soft delete - cancel)
      * @param {DeleteTaskInputDTO} inputDTO 
      * @returns {Promise<DeleteTaskOutputDTO>}
      */
@@ -33,14 +35,15 @@ class DeleteTaskUseCase {
             throw DomainException.unauthorized('You do not have permission to delete this task');
         }
 
-        // Step 4: Delete task
-        const deleted = await this.taskRepository.delete(inputDTO.taskId);
+        // Step 4: Soft delete - Cancel task (change status to CANCELLED)
+        task.cancelTask();
+        const updatedTask = await this.taskRepository.update(task);
 
         // Step 5: Return output DTO
         return new DeleteTaskOutputDTO(
             inputDTO.taskId,
-            deleted,
-            deleted ? 'Task deleted successfully' : 'Task deletion failed'
+            true,
+            'Task cancelled successfully'
         );
     }
 }

@@ -3,12 +3,15 @@
  * Represents the lifecycle states of a task
  */
 class TaskStatus {
+    static SCHEDULED = 'SCHEDULED'; // Task scheduled for future (startDate in future)
     static PENDING = 'PENDING';
     static IN_PROGRESS = 'IN_PROGRESS';
     static COMPLETED = 'COMPLETED';
+    static FAILED = 'FAILED'; // Auto-assigned when deadline passes without completion
+    static CANCELLED = 'CANCELLED'; // Task cancelled/deleted (soft delete)
 
     static getAllStatuses() {
-        return [this.PENDING, this.IN_PROGRESS, this.COMPLETED];
+        return [this.SCHEDULED, this.PENDING, this.IN_PROGRESS, this.COMPLETED, this.FAILED, this.CANCELLED];
     }
 
     static isValid(status) {

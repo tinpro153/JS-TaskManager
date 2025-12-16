@@ -46,12 +46,30 @@ class TaskController {
                 });
             }
 
+            // Parse startDate - if not provided or empty, use current datetime
+            let parsedStartDate = new Date();
+            if (startDate && startDate.trim() !== '') {
+                const tempDate = new Date(startDate);
+                if (!isNaN(tempDate.getTime())) {
+                    parsedStartDate = tempDate;
+                }
+            }
+            
+            // Parse deadline - optional, can be null
+            let parsedDeadline = null;
+            if (deadline && deadline.trim() !== '') {
+                const tempDate = new Date(deadline);
+                if (!isNaN(tempDate.getTime())) {
+                    parsedDeadline = tempDate;
+                }
+            }
+
             const inputDTO = new CreateTaskInputDTO(
                 title, 
                 description, 
                 userId, 
-                startDate ? new Date(startDate) : undefined,
-                deadline ? new Date(deadline) : undefined
+                parsedStartDate,
+                parsedDeadline
             );
             const outputDTO = await this.createTaskUseCase.execute(inputDTO);
 
@@ -155,14 +173,33 @@ class TaskController {
             const userId = req.user.userId;
             const { title, description, status, startDate, deadline } = req.body;
 
+            // Parse dates properly (same logic as createTask)
+            let parsedStartDate = undefined;
+            if (startDate && typeof startDate === 'string' && startDate.trim() !== '') {
+                const tempDate = new Date(startDate);
+                if (!isNaN(tempDate.getTime())) {
+                    parsedStartDate = tempDate;
+                }
+            }
+            
+            let parsedDeadline = undefined;
+            if (deadline && typeof deadline === 'string' && deadline.trim() !== '') {
+                const tempDate = new Date(deadline);
+                if (!isNaN(tempDate.getTime())) {
+                    parsedDeadline = tempDate;
+                }
+            } else if (deadline === null || deadline === '') {
+                parsedDeadline = null; // Explicitly set to null to clear deadline
+            }
+
             const inputDTO = new UpdateTaskInputDTO(
                 taskId, 
                 title, 
                 description, 
                 status, 
                 userId,
-                startDate ? new Date(startDate) : undefined,
-                deadline ? new Date(deadline) : undefined
+                parsedStartDate,
+                parsedDeadline
             );
             const outputDTO = await this.updateTaskUseCase.execute(inputDTO);
 

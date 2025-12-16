@@ -119,16 +119,21 @@ class SqlTaskRepository extends TaskRepository {
     toDomain(row) {
         const { TaskStatus } = require('../../domain/valueobjects/TaskStatus');
         
+        // Handle legacy data: if start_date column doesn't exist, use created_at
+        // This ensures backward compatibility with old database schemas
+        const startDate = row.start_date !== undefined ? row.start_date : row.created_at;
+        const deadline = row.deadline !== undefined ? row.deadline : null;
+        
         return Task.reconstruct(
             row.id.toLowerCase(), // Convert GUID to lowercase string
             row.title,
             row.description,
             TaskStatus.fromString(row.status), // Normalize status to uppercase
             row.user_id.toLowerCase(), // Convert GUID to lowercase string
-            row.created_at,
-            row.updated_at,
-            row.start_date,
-            row.deadline
+            startDate,           // startDate - with fallback to created_at
+            deadline,            // deadline - with fallback to null
+            row.created_at,      // createdAt
+            row.updated_at       // updatedAt
         );
     }
 }

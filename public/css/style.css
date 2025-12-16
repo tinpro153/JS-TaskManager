@@ -252,6 +252,72 @@ body {
 }
 
 /* ============================================
+   Insights Container (NEW)
+   ============================================ */
+
+.insights-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.insight {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.insight-icon {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.insight-message {
+    flex: 1;
+}
+
+.insight-success {
+    background: linear-gradient(135deg, #d3f9d8 0%, #b2f2bb 100%);
+    color: #2b8a3e;
+    border-left: 4px solid #2b8a3e;
+}
+
+.insight-warning {
+    background: linear-gradient(135deg, #fff3bf 0%, #ffec99 100%);
+    color: #e67700;
+    border-left: 4px solid #e67700;
+}
+
+.insight-danger {
+    background: linear-gradient(135deg, #ffe0e0 0%, #ffc9c9 100%);
+    color: #c92a2a;
+    border-left: 4px solid #c92a2a;
+}
+
+.insight-info {
+    background: linear-gradient(135deg, #d0ebff 0%, #a5d8ff 100%);
+    color: #1971c2;
+    border-left: 4px solid #1971c2;
+}
+
+/* ============================================
    Task Controls
    ============================================ */
 
@@ -425,19 +491,35 @@ body {
     letter-spacing: 0.5px;
 }
 
-.task-status-badge.PENDING {
+.task-status-badge.pending {
     background: var(--gray-300);
     color: var(--gray-800);
 }
 
-.task-status-badge.IN_PROGRESS {
+.task-status-badge.in-progress {
     background: linear-gradient(135deg, var(--progress-warning) 0%, #fab005 100%);
     color: var(--white);
 }
 
-.task-status-badge.COMPLETED {
+.task-status-badge.completed {
     background: linear-gradient(135deg, var(--progress-safe) 0%, #20c057 100%);
     color: var(--white);
+}
+
+.task-status-badge.failed {
+    background: linear-gradient(135deg, var(--progress-danger) 0%, #fa5252 100%);
+    color: var(--white);
+}
+
+.task-status-badge.scheduled {
+    background: var(--gray-400);
+    color: var(--gray-800);
+}
+
+.task-status-badge.cancelled {
+    background: var(--gray-500);
+    color: var(--white);
+    opacity: 0.7;
 }
 
 .quick-complete-btn {

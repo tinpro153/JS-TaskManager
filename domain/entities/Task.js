@@ -9,17 +9,36 @@ class Task {
     constructor(title, description, userId, startDate = null, deadline = null) {
         this.validateTitle(title);
         this.validateUserId(userId);
+        
+        // startDate is required - if not provided or invalid, use current datetime
+        let effectiveStartDate = new Date();
+        if (startDate) {
+            const tempDate = new Date(startDate);
+            if (!isNaN(tempDate.getTime())) {
+                effectiveStartDate = tempDate;
+            }
+        }
+        
+        // Validate deadline if provided
         if (deadline) {
-            this.validateDeadline(deadline, startDate);
+            this.validateDeadline(deadline, effectiveStartDate);
         }
         
         this.id = null; // Will be set by repository
         this.title = title.trim();
         this.description = description ? description.trim() : '';
-        this.status = TaskStatus.PENDING; // Default status
+        
+        // Business logic: Determine initial status based on startDate
+        const now = new Date();
+        if (effectiveStartDate > now) {
+            this.status = TaskStatus.SCHEDULED; // Future task
+        } else {
+            this.status = TaskStatus.PENDING; // Current or past task
+        }
+        
         this.userId = userId;
-        this.startDate = startDate || new Date();
-        this.deadline = deadline;
+        this.startDate = effectiveStartDate;
+        this.deadline = deadline; // Can be null
         this.createdAt = new Date();
         this.updatedAt = new Date();
     }
@@ -106,6 +125,21 @@ class Task {
             );
         }
         
+        // Business rule: Cannot manually set to FAILED (auto-assigned only)
+        if (newStatus === TaskStatus.FAILED && this.status !== TaskStatus.FAILED) {
+            throw DomainException.businessRuleViolation(
+                'Cannot manually set task to FAILED status. It is auto-assigned when deadline passes.'
+            );
+        }
+        
+        // Business rule: FAILED task can be completed (late completion allowed)
+        // Business rule: Cannot manually set to CANCELLED (use delete/cancel method)
+        if (newStatus === TaskStatus.CANCELLED) {
+            throw DomainException.businessRuleViolation(
+                'Cannot manually set task to CANCELLED. Use cancelTask() method instead.'
+            );
+        }
+        
         this.status = newStatus;
         this.updatedAt = new Date();
     }
@@ -134,8 +168,12 @@ class Task {
         if (isNaN(start.getTime())) {
             throw DomainException.validationError('Invalid start date format');
         }
-        if (this.deadline && start > new Date(this.deadline)) {
-            throw DomainException.validationError('Start date cannot be after deadline');
+        // Compare timestamps, not Date objects
+        if (this.deadline) {
+            const deadlineTime = new Date(this.deadline).getTime();
+            if (start.getTime() > deadlineTime) {
+                throw DomainException.validationError('Start date cannot be after deadline');
+            }
         }
         this.startDate = start;
         this.updatedAt = new Date();
@@ -160,13 +198,32 @@ class Task {
     }
 
     markAsCompleted() {
+        // Business rule: Can complete from any status (including FAILED)
+        // FAILED tasks can be marked complete if user finishes later
         this.status = TaskStatus.COMPLETED;
+        this.updatedAt = new Date();
+    }
+
+    markAsFailed() {
+        // Business rule: Can only mark as failed if not already completed or failed
+        if (this.status === TaskStatus.COMPLETED) {
+            return; // Already completed, do nothing
+        }
+        if (this.status === TaskStatus.FAILED) {
+            return; // Already failed, do nothing
+        }
+        this.status = TaskStatus.FAILED;
         this.updatedAt = new Date();
     }
 
     reopen() {
         if (this.status === TaskStatus.COMPLETED) {
             this.status = TaskStatus.IN_PROGRESS;
+        } else if (this.status === TaskStatus.FAILED) {
+            // Cannot reopen failed tasks
+            throw DomainException.businessRuleViolation(
+                'Cannot reopen a failed task. Create a new task instead.'
+            );
         } else {
             this.status = TaskStatus.PENDING;
         }
@@ -189,6 +246,47 @@ class Task {
 
     isCompleted() {
         return this.status === TaskStatus.COMPLETED;
+    }
+
+    isFailed() {
+        return this.status === TaskStatus.FAILED;
+    }
+
+    isScheduled() {
+        return this.status === TaskStatus.SCHEDULED;
+    }
+
+    isCancelled() {
+        return this.status === TaskStatus.CANCELLED;
+    }
+
+    // Business method: Check if task should be auto-marked as failed
+    shouldBeMarkedAsFailed() {
+        // Only mark as failed if:
+        // 1. Has a deadline
+        // 2. Not already completed, failed, or cancelled
+        // 3. Deadline has passed
+        if (!this.deadline) return false;
+        if (this.status === TaskStatus.COMPLETED) return false;
+        if (this.status === TaskStatus.FAILED) return false;
+        if (this.status === TaskStatus.CANCELLED) return false;
+        return new Date() > new Date(this.deadline);
+    }
+
+    // Business method: Check if task should transition from SCHEDULED to PENDING
+    shouldTransitionToPending() {
+        if (this.status !== TaskStatus.SCHEDULED) return false;
+        const now = new Date();
+        return new Date(this.startDate) <= now;
+    }
+
+    // Business method: Cancel/delete task (soft delete)
+    cancelTask() {
+        if (this.status === TaskStatus.CANCELLED) {
+            return; // Already cancelled
+        }
+        this.status = TaskStatus.CANCELLED;
+        this.updatedAt = new Date();
     }
 
     // Getters

@@ -11,7 +11,7 @@ class TaskModel {
      * - user_id: UNIQUEIDENTIFIER (Foreign Key to Users)
      * - title: NVARCHAR(200)
      * - description: NVARCHAR(1000)
-     * - status: NVARCHAR(20) (PENDING, IN_PROGRESS, COMPLETED)
+     * - status: NVARCHAR(20) (SCHEDULED, PENDING, IN_PROGRESS, COMPLETED, FAILED, CANCELLED)
      * - start_date: DATETIME2
      * - deadline: DATETIME2
      * - created_at: DATETIME2
@@ -25,13 +25,26 @@ class TaskModel {
      */
     static async create(pool, { user_id, title, description, status = 'PENDING', start_date, deadline }) {
         const request = pool.request();
+        
+        // Validate and fallback for start_date
+        let effectiveStartDate = start_date;
+        if (!start_date || !(start_date instanceof Date) || isNaN(start_date.getTime())) {
+            effectiveStartDate = new Date();
+        }
+        
+        // Validate deadline if provided
+        let effectiveDeadline = null;
+        if (deadline && deadline instanceof Date && !isNaN(deadline.getTime())) {
+            effectiveDeadline = deadline;
+        }
+        
         const result = await request
             .input('user_id', sql.UniqueIdentifier, user_id)
             .input('title', sql.NVarChar(200), title)
             .input('description', sql.NVarChar(1000), description || '')
             .input('status', sql.NVarChar(20), status)
-            .input('start_date', sql.DateTime2, start_date || new Date())
-            .input('deadline', sql.DateTime2, deadline || null)
+            .input('start_date', sql.DateTime2, effectiveStartDate)
+            .input('deadline', sql.DateTime2, effectiveDeadline)
             .query(`
                 INSERT INTO ${this.TABLE_NAME} (user_id, title, description, status, start_date, deadline)
                 OUTPUT INSERTED.*

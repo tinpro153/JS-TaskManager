@@ -32,10 +32,10 @@
             
             <div class="stat-card">
                 <div class="stat-header">
-                    <span class="stat-label">Chờ xử lý</span>
-                    <span class="stat-icon">⏳</span>
+                    <span class="stat-label">Đang chờ</span>
+                    <span class="stat-icon">📅</span>
                 </div>
-                <div class="stat-value" id="statPending">0</div>
+                <div class="stat-value" id="statScheduled">0</div>
             </div>
             
             <div class="stat-card">
@@ -53,21 +53,42 @@
                 </div>
                 <div class="stat-value" id="statCompleted">0</div>
             </div>
+            
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-label">Không hoàn thành</span>
+                    <span class="stat-icon">❌</span>
+                </div>
+                <div class="stat-value" id="statFailed">0</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-label">Đã hủy</span>
+                    <span class="stat-icon">🚫</span>
+                </div>
+                <div class="stat-value" id="statCancelled">0</div>
+            </div>
         </div>
+        
+        <!-- Insights Container (NEW - from backend) -->
+        <div id="insightsContainer" class="insights-container"></div>
         
         <!-- Task Controls -->
         <div class="task-controls">
             <div class="filter-buttons">
                 <button class="filter-btn active" data-status="ALL">Tất cả</button>
-                <button class="filter-btn" data-status="PENDING">Chờ xử lý</button>
+                <button class="filter-btn" data-status="SCHEDULED">Đang chờ</button>
                 <button class="filter-btn" data-status="IN_PROGRESS">Đang làm</button>
                 <button class="filter-btn" data-status="COMPLETED">Hoàn thành</button>
+                <button class="filter-btn" data-status="FAILED">Không hoàn thành</button>
+                <button class="filter-btn" data-status="CANCELLED">Đã hủy</button>
             </div>
             <button id="createTaskBtn" class="btn btn-primary">+ Tạo công việc mới</button>
         </div>
         
         <!-- Task List -->
-        <div id="taskList" class="tasks-grid">
+        <div id="tasksList" class="tasks-grid">
             <div class="loading-overlay">
                 <div class="spinner"></div>
             </div>

@@ -69,6 +69,7 @@ class App {
     setupRoutes() {
         const authController = this.container.getAuthController();
         const taskController = this.container.getTaskController();
+        const taskDisplayController = this.container.getTaskDisplayController();
         const authMiddleware = this.container.getAuthMiddleware();
 
         // Health check
@@ -88,7 +89,8 @@ class App {
                 version: '1.0.0',
                 endpoints: {
                     auth: '/api/auth',
-                    tasks: '/api/tasks'
+                    tasks: '/api/tasks',
+                    tasksDisplay: '/api/tasks/display'
                 }
             });
         });
@@ -101,6 +103,21 @@ class App {
 
         // Task routes (protected)
         const authenticate = authMiddleware.authenticate();
+        
+        // ==== DISPLAY ROUTES (NEW - frontend logic moved to backend) ====
+        // These endpoints return fully-enriched data for frontend rendering
+        // Frontend receives: formatted dates, localized text, progress colors, insights, etc.
+        
+        this.app.get('/api/tasks/statistics/display', authenticate, (req, res, next) => 
+            taskDisplayController.getStatisticsForDisplay(req, res, next));
+        
+        this.app.get('/api/tasks/display', authenticate, (req, res, next) => 
+            taskDisplayController.getTaskListForDisplay(req, res, next));
+        
+        this.app.get('/api/tasks/:id/display', authenticate, (req, res, next) => 
+            taskDisplayController.getTaskForDisplay(req, res, next));
+        
+        // ==== ORIGINAL ROUTES (kept for backward compatibility) ====
         
         this.app.get('/api/tasks/statistics', authenticate, (req, res) => 
             taskController.getStatistics(req, res));

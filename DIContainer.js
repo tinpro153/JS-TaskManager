@@ -19,9 +19,15 @@ const {
     GetTaskStatisticsUseCase
 } = require('./business');
 
+// Display Use Cases (NEW - frontend logic moved to backend)
+const GetTaskForDisplayUseCase = require('./business/usecases/GetTaskForDisplayUseCase');
+const GetTaskListForDisplayUseCase = require('./business/usecases/GetTaskListForDisplayUseCase');
+const GetStatisticsForDisplayUseCase = require('./business/usecases/GetStatisticsForDisplayUseCase');
+
 // Controllers
 const { AuthController } = require('./adapters/controllers/AuthController');
 const { TaskController } = require('./adapters/controllers/TaskController');
+const TaskDisplayController = require('./adapters/controllers/TaskDisplayController');
 const { AuthMiddleware } = require('./adapters/middleware/AuthMiddleware');
 
 /**
@@ -75,6 +81,11 @@ class DIContainer {
         this.changeTaskStatusUseCase = new ChangeTaskStatusUseCase(this.taskRepository);
         this.getTaskStatisticsUseCase = new GetTaskStatisticsUseCase(this.taskRepository);
 
+        // Business - Display Use Cases (NEW - frontend logic moved to backend)
+        this.getTaskForDisplayUseCase = new GetTaskForDisplayUseCase(this.taskRepository);
+        this.getTaskListForDisplayUseCase = new GetTaskListForDisplayUseCase(this.taskRepository);
+        this.getStatisticsForDisplayUseCase = new GetStatisticsForDisplayUseCase(this.taskRepository);
+
         // Adapters - Controllers
         this.authController = new AuthController(
             this.registerUserUseCase,
@@ -90,6 +101,13 @@ class DIContainer {
             this.deleteTaskUseCase,
             this.changeTaskStatusUseCase,
             this.getTaskStatisticsUseCase
+        );
+
+        // Adapters - Display Controller (NEW)
+        this.taskDisplayController = new TaskDisplayController(
+            this.getTaskForDisplayUseCase,
+            this.getTaskListForDisplayUseCase,
+            this.getStatisticsForDisplayUseCase
         );
 
         // Adapters - Middleware
@@ -114,6 +132,10 @@ class DIContainer {
 
     getTaskController() {
         return this.taskController;
+    }
+
+    getTaskDisplayController() {
+        return this.taskDisplayController;
     }
 
     getAuthMiddleware() {

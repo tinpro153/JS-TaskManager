@@ -203,7 +203,7 @@ class API {
 
     /**
      * Get all tasks for current user
-     * @param {string|null} [status=null] - Filter by status (PENDING, IN_PROGRESS, COMPLETED)
+     * @param {string|null} [status=null] - Filter by status (SCHEDULED, PENDING, IN_PROGRESS, COMPLETED, FAILED, CANCELLED)
      * @returns {Promise<Object>} Response with tasks array containing progress/isOverdue
      * @example
      * const response = await API.getTasks('PENDING');
@@ -279,7 +279,7 @@ class API {
     /**
      * Change task status
      * @param {string} taskId - Task UUID
-     * @param {string} status - New status (PENDING, IN_PROGRESS, COMPLETED)
+     * @param {string} status - New status (PENDING, IN_PROGRESS, COMPLETED) - Note: FAILED is auto-assigned only
      * @returns {Promise<Object>} Response with updated task including progress/isOverdue
      * @throws {Error} When business rule violated (e.g., COMPLETED → PENDING)
      * @example
@@ -304,6 +304,52 @@ class API {
      */
     static async getStatistics() {
         return this.request('/tasks/statistics', {
+            method: 'GET',
+            headers: this.getAuthHeaders()
+        });
+    }
+
+    // ============================================================================
+    // DISPLAY ENDPOINTS (NEW - Backend handles ALL presentation logic)
+    // ============================================================================
+
+    /**
+     * Get task with full display data (formatted dates, colors, permissions, etc.)
+     * Backend returns EVERYTHING needed for rendering - NO client-side calculations!
+     * @param {string} taskId - Task UUID
+     * @returns {Promise<Object>} Task with display enrichment
+     */
+    static async getTaskForDisplay(taskId) {
+        return this.request(`/tasks/${taskId}/display`, {
+            method: 'GET',
+            headers: this.getAuthHeaders()
+        });
+    }
+
+    /**
+     * Get task list with full display enrichment
+     * Backend returns fully-processed data ready for rendering
+     * @param {string|null} statusFilter - Optional status filter (ALL | SCHEDULED | IN_PROGRESS | COMPLETED | FAILED | CANCELLED)
+     * @returns {Promise<Object>} Tasks array with display data, count, filter info, empty message
+     */
+    static async getTaskListForDisplay(statusFilter = null) {
+        let endpoint = '/tasks/display';
+        if (statusFilter && statusFilter !== 'ALL') {
+            endpoint += `?status=${statusFilter}`;
+        }
+        return this.request(endpoint, {
+            method: 'GET',
+            headers: this.getAuthHeaders()
+        });
+    }
+
+    /**
+     * Get statistics with formatting and actionable insights
+     * Backend returns formatted strings AND business insights
+     * @returns {Promise<Object>} Statistics with formatting and insights
+     */
+    static async getStatisticsForDisplay() {
+        return this.request('/tasks/statistics/display', {
             method: 'GET',
             headers: this.getAuthHeaders()
         });
@@ -337,6 +383,15 @@ const Utils = {
         }
     },
 
+    // ============================================
+    // DEPRECATED: These functions are no longer needed
+    // Backend now handles ALL formatting and localization
+    // ============================================
+    
+    /**
+     * @deprecated Use backend display endpoints instead
+     * Backend returns formatted dates in response
+     */
     formatDate(dateString) {
         const date = new Date(dateString);
         return date.toLocaleDateString('vi-VN', {
@@ -348,6 +403,10 @@ const Utils = {
         });
     },
 
+    /**
+     * @deprecated Use backend display endpoints instead
+     * Backend returns statusText in response
+     */
     getStatusText(status) {
         const statusMap = {
             'PENDING': 'Chờ xử lý',

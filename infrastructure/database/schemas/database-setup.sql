@@ -77,6 +77,8 @@ CREATE TABLE dbo.Tasks (
     title NVARCHAR(200) NOT NULL,
     description NVARCHAR(1000) NULL,
     status NVARCHAR(20) NOT NULL DEFAULT 'PENDING',
+    start_date DATETIME2 NOT NULL DEFAULT GETUTCDATE(), -- Default to creation time
+    deadline DATETIME2 NULL,        -- Optional, can be NULL
     created_at DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
     updated_at DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
     
@@ -85,15 +87,18 @@ CREATE TABLE dbo.Tasks (
         REFERENCES dbo.Users(id) ON DELETE CASCADE,
     
     -- Check constraint for valid status values
-    CONSTRAINT CK_Tasks_Status CHECK (status IN ('PENDING', 'IN_PROGRESS', 'COMPLETED'))
+    CONSTRAINT CK_Tasks_Status CHECK (status IN ('SCHEDULED', 'PENDING', 'IN_PROGRESS', 'COMPLETED', 'FAILED', 'CANCELLED'))
 );
 
 -- Create indexes for performance
 CREATE INDEX IX_Tasks_UserId ON dbo.Tasks(user_id);
 CREATE INDEX IX_Tasks_Status ON dbo.Tasks(status);
 CREATE INDEX IX_Tasks_UserId_Status ON dbo.Tasks(user_id, status);
+CREATE INDEX IX_Tasks_StartDate ON dbo.Tasks(start_date);
+CREATE INDEX IX_Tasks_Deadline ON dbo.Tasks(deadline);
 
 PRINT 'Tasks table created successfully.';
+PRINT 'Columns: id, user_id, title, description, status, start_date, deadline, created_at, updated_at';
 GO
 
 -- ============================================
@@ -173,12 +178,14 @@ GO
 DECLARE @user1_id UNIQUEIDENTIFIER = NEWID();
 DECLARE @user2_id UNIQUEIDENTIFIER = NEWID();
 DECLARE @user3_id UNIQUEIDENTIFIER = NEWID();
+DECLARE @user4_id UNIQUEIDENTIFIER = NEWID();
 
 INSERT INTO dbo.Users (id, username, email, password, created_at, updated_at)
 VALUES 
     (@user1_id, 'johndoe', 'john.doe@example.com', '$2b$10$rXQ3Qqz8b9K5gJZJ5aB5ZeG5YH5J5aB5ZeG5YH5J5aB5ZeG5YH5J5a', GETUTCDATE(), GETUTCDATE()),
     (@user2_id, 'janedoe', 'jane.doe@example.com', '$2b$10$rXQ3Qqz8b9K5gJZJ5aB5ZeG5YH5J5aB5ZeG5YH5J5aB5ZeG5YH5J5a', GETUTCDATE(), GETUTCDATE()),
-    (@user3_id, 'testuser', 'test@example.com', '$2b$10$rXQ3Qqz8b9K5gJZJ5aB5ZeG5YH5J5aB5ZeG5YH5J5aB5ZeG5YH5J5a', GETUTCDATE(), GETUTCDATE());
+    (@user3_id, 'testuser', 'test@example.com', '$2b$10$rXQ3Qqz8b9K5gJZJ5aB5ZeG5YH5J5aB5ZeG5YH5J5aB5ZeG5YH5J5a', GETUTCDATE(), GETUTCDATE()),
+    (@user4_id, 'hayami', 'nqtuanp2005@gmail.com', '$2b$10$WijFod5JggJQQj5id519hOp95mKchdr.VSF8Lr/krypZXicHtoJTa', GETUTCDATE(), GETUTCDATE());
 
 PRINT 'Sample users inserted successfully.';
 PRINT 'User 1 ID: ' + CAST(@user1_id AS NVARCHAR(50));
@@ -191,31 +198,54 @@ DECLARE @user1_id UNIQUEIDENTIFIER = (SELECT id FROM dbo.Users WHERE username = 
 DECLARE @user2_id UNIQUEIDENTIFIER = (SELECT id FROM dbo.Users WHERE username = 'janedoe');
 DECLARE @user3_id UNIQUEIDENTIFIER = (SELECT id FROM dbo.Users WHERE username = 'testuser');
 
--- Sample Tasks for User 1 (johndoe)
-INSERT INTO dbo.Tasks (id, user_id, title, description, status, created_at, updated_at)
+-- Sample Tasks for User 1 (johndoe) - with dates and ALL statuses
+INSERT INTO dbo.Tasks (id, user_id, title, description, status, start_date, deadline, created_at, updated_at)
 VALUES 
-    (NEWID(), @user1_id, 'Setup development environment', 'Install Node.js, SQL Server, and VS Code', 'COMPLETED', GETUTCDATE(), GETUTCDATE()),
-    (NEWID(), @user1_id, 'Review Clean Architecture principles', 'Read documentation and understand layer separation', 'COMPLETED', GETUTCDATE(), GETUTCDATE()),
-    (NEWID(), @user1_id, 'Implement authentication module', 'Create register, login, and token verification use cases', 'IN_PROGRESS', GETUTCDATE(), GETUTCDATE()),
-    (NEWID(), @user1_id, 'Write unit tests', 'Add tests for domain entities and use cases', 'PENDING', GETUTCDATE(), GETUTCDATE()),
-    (NEWID(), @user1_id, 'Deploy to production', 'Setup Azure App Service and SQL Database', 'PENDING', GETUTCDATE(), GETUTCDATE());
+    -- COMPLETED tasks
+    (NEWID(), @user1_id, 'Setup development environment', 'Install Node.js, SQL Server, and VS Code', 'COMPLETED', DATEADD(day, -10, GETUTCDATE()), DATEADD(day, -8, GETUTCDATE()), DATEADD(day, -10, GETUTCDATE()), DATEADD(day, -8, GETUTCDATE())),
+    (NEWID(), @user1_id, 'Review Clean Architecture principles', 'Read documentation and understand layer separation', 'COMPLETED', DATEADD(day, -7, GETUTCDATE()), DATEADD(day, -5, GETUTCDATE()), DATEADD(day, -7, GETUTCDATE()), DATEADD(day, -5, GETUTCDATE())),
+    -- IN_PROGRESS task
+    (NEWID(), @user1_id, 'Implement authentication module', 'Create register, login, and token verification use cases', 'IN_PROGRESS', DATEADD(day, -3, GETUTCDATE()), DATEADD(day, 2, GETUTCDATE()), DATEADD(day, -3, GETUTCDATE()), GETUTCDATE()),
+    -- PENDING task
+    (NEWID(), @user1_id, 'Write unit tests', 'Add tests for domain entities and use cases', 'PENDING', GETUTCDATE(), DATEADD(day, 5, GETUTCDATE()), GETUTCDATE(), GETUTCDATE()),
+    -- SCHEDULED task (future start date)
+    (NEWID(), @user1_id, 'Deploy to production', 'Setup Azure App Service and SQL Database', 'SCHEDULED', DATEADD(day, 3, GETUTCDATE()), DATEADD(day, 10, GETUTCDATE()), GETUTCDATE(), GETUTCDATE()),
+    -- FAILED task (deadline passed, not completed)
+    (NEWID(), @user1_id, 'Fix critical bug', 'Urgent bug fix required', 'FAILED', DATEADD(day, -5, GETUTCDATE()), DATEADD(day, -2, GETUTCDATE()), DATEADD(day, -5, GETUTCDATE()), GETUTCDATE()),
+    -- CANCELLED task (soft deleted)
+    (NEWID(), @user1_id, 'Old feature request', 'This was cancelled due to priority change', 'CANCELLED', DATEADD(day, -8, GETUTCDATE()), DATEADD(day, -1, GETUTCDATE()), DATEADD(day, -8, GETUTCDATE()), GETUTCDATE());
 
--- Sample Tasks for User 2 (janedoe)
-INSERT INTO dbo.Tasks (id, user_id, title, description, status, created_at, updated_at)
+-- Sample Tasks for User 2 (janedoe) - with dates and various statuses
+INSERT INTO dbo.Tasks (id, user_id, title, description, status, start_date, deadline, created_at, updated_at)
 VALUES 
-    (NEWID(), @user2_id, 'Design database schema', 'Create ERD and define all tables', 'COMPLETED', GETUTCDATE(), GETUTCDATE()),
-    (NEWID(), @user2_id, 'Implement task CRUD operations', 'Add create, read, update, delete functionality', 'COMPLETED', GETUTCDATE(), GETUTCDATE()),
-    (NEWID(), @user2_id, 'Build frontend dashboard', 'Create HTML, CSS, and JavaScript for UI', 'IN_PROGRESS', GETUTCDATE(), GETUTCDATE()),
-    (NEWID(), @user2_id, 'Add task statistics feature', 'Show completion rate and task counts', 'PENDING', GETUTCDATE(), GETUTCDATE());
+    -- COMPLETED tasks
+    (NEWID(), @user2_id, 'Design database schema', 'Create ERD and define all tables', 'COMPLETED', DATEADD(day, -15, GETUTCDATE()), DATEADD(day, -12, GETUTCDATE()), DATEADD(day, -15, GETUTCDATE()), DATEADD(day, -12, GETUTCDATE())),
+    (NEWID(), @user2_id, 'Implement task CRUD operations', 'Add create, read, update, delete functionality', 'COMPLETED', DATEADD(day, -10, GETUTCDATE()), DATEADD(day, -7, GETUTCDATE()), DATEADD(day, -10, GETUTCDATE()), DATEADD(day, -7, GETUTCDATE())),
+    -- IN_PROGRESS task
+    (NEWID(), @user2_id, 'Build frontend dashboard', 'Create HTML, CSS, and JavaScript for UI', 'IN_PROGRESS', DATEADD(day, -5, GETUTCDATE()), DATEADD(day, 3, GETUTCDATE()), DATEADD(day, -5, GETUTCDATE()), GETUTCDATE()),
+    -- PENDING task
+    (NEWID(), @user2_id, 'Add task statistics feature', 'Show completion rate and task counts', 'PENDING', GETUTCDATE(), DATEADD(day, 7, GETUTCDATE()), GETUTCDATE(), GETUTCDATE()),
+    -- SCHEDULED task
+    (NEWID(), @user2_id, 'Performance optimization', 'Optimize database queries', 'SCHEDULED', DATEADD(day, 5, GETUTCDATE()), DATEADD(day, 15, GETUTCDATE()), GETUTCDATE(), GETUTCDATE()),
+    -- CANCELLED task
+    (NEWID(), @user2_id, 'Deprecated feature', 'This feature was removed from requirements', 'CANCELLED', DATEADD(day, -12, GETUTCDATE()), DATEADD(day, -5, GETUTCDATE()), DATEADD(day, -12, GETUTCDATE()), GETUTCDATE());
 
--- Sample Tasks for User 3 (testuser)
-INSERT INTO dbo.Tasks (id, user_id, title, description, status, created_at, updated_at)
+-- Sample Tasks for User 3 (testuser) - with dates and all statuses
+INSERT INTO dbo.Tasks (id, user_id, title, description, status, start_date, deadline, created_at, updated_at)
 VALUES 
-    (NEWID(), @user3_id, 'Learn SQL Server', 'Complete online tutorial on T-SQL basics', 'COMPLETED', GETUTCDATE(), GETUTCDATE()),
-    (NEWID(), @user3_id, 'Practice Clean Architecture', 'Build sample project following CA principles', 'IN_PROGRESS', GETUTCDATE(), GETUTCDATE()),
-    (NEWID(), @user3_id, 'Buy groceries', 'Milk, eggs, bread, and vegetables', 'PENDING', GETUTCDATE(), GETUTCDATE()),
-    (NEWID(), @user3_id, 'Exercise routine', 'Monday: Chest, Tuesday: Back, Wednesday: Legs', 'PENDING', GETUTCDATE(), GETUTCDATE()),
-    (NEWID(), @user3_id, 'Read architecture book', 'Finish Clean Architecture by Robert C. Martin', 'PENDING', GETUTCDATE(), GETUTCDATE());
+    -- COMPLETED task
+    (NEWID(), @user3_id, 'Learn SQL Server', 'Complete online tutorial on T-SQL basics', 'COMPLETED', DATEADD(day, -20, GETUTCDATE()), DATEADD(day, -15, GETUTCDATE()), DATEADD(day, -20, GETUTCDATE()), DATEADD(day, -15, GETUTCDATE())),
+    -- IN_PROGRESS task
+    (NEWID(), @user3_id, 'Practice Clean Architecture', 'Build sample project following CA principles', 'IN_PROGRESS', DATEADD(day, -10, GETUTCDATE()), DATEADD(day, 5, GETUTCDATE()), DATEADD(day, -10, GETUTCDATE()), GETUTCDATE()),
+    -- PENDING tasks
+    (NEWID(), @user3_id, 'Buy groceries', 'Milk, eggs, bread, and vegetables', 'PENDING', GETUTCDATE(), NULL, GETUTCDATE(), GETUTCDATE()),
+    (NEWID(), @user3_id, 'Exercise routine', 'Monday: Chest, Tuesday: Back, Wednesday: Legs', 'PENDING', GETUTCDATE(), NULL, GETUTCDATE(), GETUTCDATE()),
+    -- SCHEDULED task (future start)
+    (NEWID(), @user3_id, 'Read architecture book', 'Finish Clean Architecture by Robert C. Martin', 'SCHEDULED', DATEADD(day, 7, GETUTCDATE()), DATEADD(day, 30, GETUTCDATE()), GETUTCDATE(), GETUTCDATE()),
+    -- FAILED task (missed deadline)
+    (NEWID(), @user3_id, 'Complete online course', 'Deadline was yesterday', 'FAILED', DATEADD(day, -14, GETUTCDATE()), DATEADD(day, -1, GETUTCDATE()), DATEADD(day, -14, GETUTCDATE()), GETUTCDATE()),
+    -- CANCELLED task
+    (NEWID(), @user3_id, 'Attend conference', 'Conference was cancelled', 'CANCELLED', DATEADD(day, -30, GETUTCDATE()), DATEADD(day, 10, GETUTCDATE()), DATEADD(day, -30, GETUTCDATE()), GETUTCDATE());
 
 PRINT 'Sample tasks inserted successfully.';
 GO
@@ -253,9 +283,12 @@ PRINT '-------------------------------------------';
 SELECT 
     u.username AS Username,
     COUNT(t.id) AS TotalTasks,
+    SUM(CASE WHEN t.status = 'SCHEDULED' THEN 1 ELSE 0 END) AS Scheduled,
     SUM(CASE WHEN t.status = 'PENDING' THEN 1 ELSE 0 END) AS Pending,
     SUM(CASE WHEN t.status = 'IN_PROGRESS' THEN 1 ELSE 0 END) AS InProgress,
     SUM(CASE WHEN t.status = 'COMPLETED' THEN 1 ELSE 0 END) AS Completed,
+    SUM(CASE WHEN t.status = 'FAILED' THEN 1 ELSE 0 END) AS Failed,
+    SUM(CASE WHEN t.status = 'CANCELLED' THEN 1 ELSE 0 END) AS Cancelled,
     CAST(
         (SUM(CASE WHEN t.status = 'COMPLETED' THEN 1.0 ELSE 0 END) / 
         NULLIF(COUNT(t.id), 0)) * 100 
@@ -288,6 +321,48 @@ PRINT '';
 PRINT '============================================';
 PRINT 'SETUP COMPLETE - Ready to use!';
 PRINT '============================================';
+PRINT '';
+PRINT 'Database Schema:';
+PRINT '- Users: id, username, email, password, created_at, updated_at';
+PRINT '- Tasks: id, user_id, title, description, status, start_date, deadline, created_at, updated_at';
+PRINT '';
+PRINT 'Date columns in Tasks table:';
+PRINT '- start_date: DATETIME2 NOT NULL (required by application)';
+PRINT '- deadline: DATETIME2 NULL (optional - can be NULL)';
 GO
 
-ALTER TABLE Tasks ADD start_date DATETIME2 DEFAULT GETDATE(); ALTER TABLE Tasks ADD deadline DATETIME2 NULL;
+-- ============================================
+-- MIGRATION: Add date columns if not exist
+-- (For existing databases that don't have these columns)
+-- ============================================
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('dbo.Tasks') AND name = 'start_date')
+BEGIN
+    PRINT '';
+    PRINT 'Adding start_date column to existing Tasks table...';
+    ALTER TABLE dbo.Tasks ADD start_date DATETIME2 NOT NULL DEFAULT GETUTCDATE();
+    CREATE INDEX IX_Tasks_StartDate ON dbo.Tasks(start_date);
+    PRINT 'start_date column added successfully.';
+END
+ELSE
+BEGIN
+    PRINT 'start_date column already exists.';
+END
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('dbo.Tasks') AND name = 'deadline')
+BEGIN
+    PRINT '';
+    PRINT 'Adding deadline column to existing Tasks table...';
+    ALTER TABLE dbo.Tasks ADD deadline DATETIME2 NULL;
+    CREATE INDEX IX_Tasks_Deadline ON dbo.Tasks(deadline);
+    PRINT 'deadline column added successfully.';
+END
+ELSE
+BEGIN
+    PRINT 'deadline column already exists.';
+END
+GO
+
+PRINT '';
+PRINT 'Date columns migration complete!';
+GO
