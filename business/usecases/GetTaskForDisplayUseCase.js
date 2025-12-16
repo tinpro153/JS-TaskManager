@@ -96,13 +96,31 @@ class GetTaskForDisplayUseCase {
         const d = new Date(date);
         if (isNaN(d.getTime())) return 'N/A';
 
-        const day = String(d.getDate()).padStart(2, '0');
-        const month = String(d.getMonth() + 1).padStart(2, '0');
-        const year = d.getFullYear();
-        const hours = String(d.getHours()).padStart(2, '0');
-        const minutes = String(d.getMinutes()).padStart(2, '0');
-
-        return `${day}/${month}/${year} ${hours}:${minutes}`;
+        // Use toLocaleString with Asia/Ho_Chi_Minh timezone for consistent formatting
+        // This ensures dates display correctly regardless of server timezone (UTC in Docker)
+        try {
+            const options = {
+                timeZone: 'Asia/Ho_Chi_Minh',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            };
+            
+            const formatted = d.toLocaleString('en-GB', options);
+            // Format: "DD/MM/YYYY, HH:MM" -> "DD/MM/YYYY HH:MM"
+            return formatted.replace(',', '');
+        } catch (error) {
+            // Fallback to UTC if timezone not supported
+            const day = String(d.getUTCDate()).padStart(2, '0');
+            const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+            const year = d.getUTCFullYear();
+            const hours = String(d.getUTCHours()).padStart(2, '0');
+            const minutes = String(d.getUTCMinutes()).padStart(2, '0');
+            return `${day}/${month}/${year} ${hours}:${minutes}`;
+        }
     }
 
     _calculateOverdueMessage(deadline) {

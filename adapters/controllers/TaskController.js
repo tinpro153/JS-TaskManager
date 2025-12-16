@@ -40,18 +40,12 @@ class TaskController {
 
             let parsedStartDate = new Date();
             if (startDate && startDate.trim() !== '') {
-                const tempDate = new Date(startDate);
-                if (!isNaN(tempDate.getTime())) {
-                    parsedStartDate = tempDate;
-                }
+                parsedStartDate = this._parseVietnamDateTime(startDate);
             }
             
             let parsedDeadline = null;
             if (deadline && deadline.trim() !== '') {
-                const tempDate = new Date(deadline);
-                if (!isNaN(tempDate.getTime())) {
-                    parsedDeadline = tempDate;
-                }
+                parsedDeadline = this._parseVietnamDateTime(deadline);
             }
 
             const inputDTO = new CreateTaskInputDTO(
@@ -152,18 +146,12 @@ class TaskController {
 
             let parsedStartDate = undefined;
             if (startDate && typeof startDate === 'string' && startDate.trim() !== '') {
-                const tempDate = new Date(startDate);
-                if (!isNaN(tempDate.getTime())) {
-                    parsedStartDate = tempDate;
-                }
+                parsedStartDate = this._parseVietnamDateTime(startDate);
             }
             
             let parsedDeadline = undefined;
             if (deadline && typeof deadline === 'string' && deadline.trim() !== '') {
-                const tempDate = new Date(deadline);
-                if (!isNaN(tempDate.getTime())) {
-                    parsedDeadline = tempDate;
-                }
+                parsedDeadline = this._parseVietnamDateTime(deadline);
             } else if (deadline === null || deadline === '') {
                 parsedDeadline = null;
             }
@@ -299,6 +287,47 @@ class TaskController {
                 return 404;
             default:
                 return 400;
+        }
+    }
+
+    /**
+     * Parse datetime string from frontend (Vietnam timezone) and convert to UTC Date object.
+     * Frontend sends datetime without timezone info (e.g., "2025-12-16T23:00").
+     * We need to treat it as Vietnam time (UTC+7) and convert to UTC for database storage.
+     * 
+     * @param {string} dateTimeString - DateTime string from frontend (format: "YYYY-MM-DDTHH:mm")
+     * @returns {Date|null} - UTC Date object or null if invalid
+     */
+    _parseVietnamDateTime(dateTimeString) {
+        if (!dateTimeString) return null;
+        
+        try {
+            // Frontend sends: "2025-12-16T23:00" (no timezone info)
+            // JavaScript Date constructor interprets this differently based on format:
+            // - ISO format with 'T' and no timezone → treated as UTC (wrong!)
+            // - We need to explicitly parse as Vietnam time and convert to UTC
+            
+            // Parse the date string
+            const tempDate = new Date(dateTimeString);
+            if (isNaN(tempDate.getTime())) return null;
+            
+            // Get the components in local time (which will be UTC in Docker)
+            const year = tempDate.getUTCFullYear();
+            const month = tempDate.getUTCMonth();
+            const day = tempDate.getUTCDate();
+            const hours = tempDate.getUTCHours();
+            const minutes = tempDate.getUTCMinutes();
+            const seconds = tempDate.getUTCSeconds();
+            
+            // Create a new date treating these values as Vietnam time
+            // Vietnam is UTC+7, so we subtract 7 hours to get UTC
+            const vietnamDate = new Date(Date.UTC(year, month, day, hours, minutes, seconds));
+            vietnamDate.setHours(vietnamDate.getHours() - 7);
+            
+            return vietnamDate;
+        } catch (error) {
+            console.error('Error parsing Vietnam datetime:', error);
+            return null;
         }
     }
 }
