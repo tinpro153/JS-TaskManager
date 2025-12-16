@@ -1,7 +1,7 @@
-const { SqlTaskRepository } = require('../../adapters/repositories/MongoTaskRepository');
+const { SqlTaskRepository } = require('../../adapters/repositories/SqlTaskRepository');
 const { Task } = require('../../domain/entities/Task');
 const { TaskStatus } = require('../../domain/valueobjects/TaskStatus');
-const { SqlServerDatabase } = require('../../infrastructure/database/MongoDatabase');
+const { SqlServerDatabase } = require('../../infrastructure/database/SqlServerDatabase');
 
 describe('SqlTaskRepository Integration Tests', () => {
     let repository;
@@ -27,7 +27,7 @@ beforeAll(async () => {
         repository = new SqlTaskRepository(database);
         
         // Create test user first (needed for foreign key)
-        const { SqlUserRepository } = require('../../adapters/repositories/MongoUserRepository');
+        const { SqlUserRepository } = require('../../adapters/repositories/SqlUserRepository');
         const { User } = require('../../domain/entities/User');
         const userRepo = new SqlUserRepository(database);
         const testUser = new User(
@@ -51,7 +51,7 @@ beforeAll(async () => {
         // Cleanup test user
         if (testUserId) {
             try {
-                const { SqlUserRepository } = require('../../adapters/repositories/MongoUserRepository');
+                const { SqlUserRepository } = require('../../adapters/repositories/SqlUserRepository');
                 const userRepo = new SqlUserRepository(database);
                 await userRepo.delete(testUserId);
             } catch (error) {

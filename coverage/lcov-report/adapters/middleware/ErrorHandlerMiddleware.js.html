@@ -3,15 +3,15 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for infrastructure/database/models/TaskModel.js</title>
+    <title>Code coverage report for adapters/middleware/ErrorHandlerMiddleware.js</title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="../../../prettify.css" />
-    <link rel="stylesheet" href="../../../base.css" />
-    <link rel="shortcut icon" type="image/x-icon" href="../../../favicon.png" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style type='text/css'>
         .coverage-summary .sorter {
-            background-image: url(../../../sort-arrow-sprite.png);
+            background-image: url(../../sort-arrow-sprite.png);
         }
     </style>
 </head>
@@ -19,34 +19,34 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../../../index.html">All files</a> / <a href="index.html">infrastructure/database/models</a> TaskModel.js</h1>
+        <h1><a href="../../index.html">All files</a> / <a href="index.html">adapters/middleware</a> ErrorHandlerMiddleware.js</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">87.75% </span>
+                <span class="strong">8.57% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>43/49</span>
+                <span class='fraction'>3/35</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">61.9% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>13/21</span>
+                <span class='fraction'>0/32</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">80% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>8/10</span>
+                <span class='fraction'>0/6</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">87.75% </span>
+                <span class="strong">8.57% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>43/49</span>
+                <span class='fraction'>3/35</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line medium'></div>
+    <div class='status-line low'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -268,7 +268,12 @@
 <a name='L203'></a><a href='#L203'>203</a>
 <a name='L204'></a><a href='#L204'>204</a>
 <a name='L205'></a><a href='#L205'>205</a>
-<a name='L206'></a><a href='#L206'>206</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">2x</span>
+<a name='L206'></a><a href='#L206'>206</a>
+<a name='L207'></a><a href='#L207'>207</a>
+<a name='L208'></a><a href='#L208'>208</a>
+<a name='L209'></a><a href='#L209'>209</a>
+<a name='L210'></a><a href='#L210'>210</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -284,142 +289,133 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">8x</span>
-<span class="cline-any cline-yes">8x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">8x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">41x</span>
-<span class="cline-any cline-yes">41x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">41x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">8x</span>
-<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -436,22 +432,21 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">8x</span>
-<span class="cline-any cline-yes">8x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">8x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -472,212 +467,229 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">const sql = require('mssql');
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">const { DomainException } = require('../../domain/exceptions/DomainException');
+const { Config } = require('../../infrastructure/config/Config');
 &nbsp;
 /**
- * SQL Server Task Table Queries
- * Infrastructure layer - Framework-specific implementation
+ * Centralized Error Handler Middleware
+ * Maps domain exceptions to HTTP status codes and provides consistent error responses
  */
-class TaskModel {
+class ErrorHandlerMiddleware {
     /**
-     * Task table structure:
-     * - id: UNIQUEIDENTIFIER (Primary Key)
-     * - user_id: UNIQUEIDENTIFIER (Foreign Key to Users)
-     * - title: NVARCHAR(200)
-     * - description: NVARCHAR(1000)
-     * - status: NVARCHAR(20) (PENDING, IN_PROGRESS, COMPLETED)
-     * - start_date: DATETIME2
-     * - deadline: DATETIME2
-     * - created_at: DATETIME2
-     * - updated_at: DATETIME2
+     * Global Express error handler
+     * @param {Error} err - Error object
+     * @param {Object} req - Express request
+     * @param {Object} res - Express response
+     * @param {Function} next - Next middleware
      */
+<span class="fstat-no" title="function not covered" >    st</span>atic handle(err, req, res, next) {
+        // Log error details
+<span class="cstat-no" title="statement not covered" >        ErrorHandlerMiddleware.logError(err, req);</span>
 &nbsp;
-    static TABLE_NAME = 'Tasks';
-&nbsp;
-    /**
-     * Create a new task
-     */
-    static async create(pool, { user_id, title, description, status = <span class="branch-0 cbranch-no" title="branch not covered" >'PENDING',</span> start_date, deadline }) {
-        const request = pool.request();
-        const result = await request
-            .input('user_id', sql.UniqueIdentifier, user_id)
-            .input('title', sql.NVarChar(200), title)
-            .input('description', sql.NVarChar(1000), description || '')
-            .input('status', sql.NVarChar(20), status)
-            .input('start_date', sql.DateTime2, start_date || <span class="branch-1 cbranch-no" title="branch not covered" >new Date())</span>
-            .input('deadline', sql.DateTime2, deadline || null)
-            .query(`
-                INSERT INTO ${this.TABLE_NAME} (user_id, title, description, status, start_date, deadline)
-                OUTPUT INSERTED.*
-                VALUES (@user_id, @title, @description, @status, @start_date, @deadline)
-            `);
-        return result.recordset[0];
-    }
-&nbsp;
-    /**
-     * Find task by ID
-     */
-    static async findById(pool, id) {
-        const request = pool.request();
-        const result = await request
-            .input('id', sql.UniqueIdentifier, id)
-            .query(`SELECT * FROM ${this.TABLE_NAME} WHERE id = @id`);
-        return result.recordset[0] || null;
-    }
-&nbsp;
-    /**
-     * Find tasks by user ID
-     */
-    static async findByUserId(pool, userId) {
-        const request = pool.request();
-        const result = await request
-            .input('userId', sql.UniqueIdentifier, userId)
-            .query(`
-                SELECT * FROM ${this.TABLE_NAME} 
-                WHERE user_id = @userId 
-                ORDER BY created_at DESC
-            `);
-        return result.recordset;
-    }
-&nbsp;
-    /**
-     * Find tasks by user ID and status
-     */
-    static async findByUserIdAndStatus(pool, userId, status) {
-        const request = pool.request();
-        const result = await request
-            .input('userId', sql.UniqueIdentifier, userId)
-            .input('status', sql.NVarChar(20), status)
-            .query(`
-                SELECT * FROM ${this.TABLE_NAME} 
-                WHERE user_id = @userId AND status = @status
-                ORDER BY created_at DESC
-            `);
-        return result.recordset;
-    }
-&nbsp;
-    /**
-     * Update task
-     */
-    static async update(pool, id, { title, description, start_date, deadline }) {
-        const request = pool.request();
-        
-        // Build dynamic update query
-        let query = `UPDATE ${this.TABLE_NAME} SET `;
-        const updates = [];
-        
-        <span class="missing-if-branch" title="else path not taken" >E</span>if (title !== undefined) {
-            request.input('title', sql.NVarChar(200), title);
-            updates.push('title = @title');
+        // Handle domain exceptions (business rule violations)
+<span class="cstat-no" title="statement not covered" >        if (err instanceof DomainException) {</span>
+<span class="cstat-no" title="statement not covered" >            return ErrorHandlerMiddleware.handleDomainException(err, res);</span>
         }
-        <span class="missing-if-branch" title="else path not taken" >E</span>if (description !== undefined) {
-            request.input('description', sql.NVarChar(1000), description || <span class="branch-1 cbranch-no" title="branch not covered" >'')</span>;
-            updates.push('description = @description');
+&nbsp;
+        // Handle JWT errors
+<span class="cstat-no" title="statement not covered" >        if (err.name === 'JsonWebTokenError') {</span>
+<span class="cstat-no" title="statement not covered" >            return res.status(401).json({</span>
+                success: false,
+                error: 'Invalid token'
+            });
         }
-        <span class="missing-if-branch" title="else path not taken" >E</span>if (start_date !== undefined) {
-            request.input('start_date', sql.DateTime2, start_date);
-            updates.push('start_date = @start_date');
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        if (err.name === 'TokenExpiredError') {</span>
+<span class="cstat-no" title="statement not covered" >            return res.status(401).json({</span>
+                success: false,
+                error: 'Token expired'
+            });
         }
-        <span class="missing-if-branch" title="else path not taken" >E</span>if (deadline !== undefined) {
-            request.input('deadline', sql.DateTime2, deadline);
-            updates.push('deadline = @deadline');
+&nbsp;
+        // Handle validation errors (express-validator or custom)
+<span class="cstat-no" title="statement not covered" >        if (err.name === 'ValidationError') {</span>
+<span class="cstat-no" title="statement not covered" >            return res.status(400).json({</span>
+                success: false,
+                error: err.message
+            });
         }
-        
-        <span class="missing-if-branch" title="if path not taken" >I</span>if (updates.length === 0) {
-<span class="cstat-no" title="statement not covered" >            return await this.findById(pool, id);</span>
+&nbsp;
+        // Handle database connection errors
+<span class="cstat-no" title="statement not covered" >        if (err.code === 'ECONNREFUSED' || err.code === 'ETIMEDOUT') {</span>
+<span class="cstat-no" title="statement not covered" >            return res.status(503).json({</span>
+                success: false,
+                error: 'Service temporarily unavailable'
+            });
         }
-        
-        query += updates.join(', ') + ' WHERE id = @id';
-        
-        // UPDATE without OUTPUT due to trigger conflict
-        request.input('id', sql.UniqueIdentifier, id);
-        await request.query(query);
-        
-        // Fetch updated record
-        return await this.findById(pool, id);
+&nbsp;
+        // Handle SQL errors
+<span class="cstat-no" title="statement not covered" >        if (err.code &amp;&amp; err.code.startsWith('E')) {</span>
+<span class="cstat-no" title="statement not covered" >            return ErrorHandlerMiddleware.handleDatabaseError(err, res);</span>
+        }
+&nbsp;
+        // Default to 500 Internal Server Error
+<span class="cstat-no" title="statement not covered" >        ErrorHandlerMiddleware.handleUnexpectedError(err, res);</span>
     }
 &nbsp;
     /**
-     * Update task status
+     * Handle domain exceptions with appropriate HTTP status codes
+     * @param {DomainException} err - Domain exception
+     * @param {Object} res - Express response
      */
-    static async updateStatus(pool, id, status) {
-        const request = pool.request();
-        // UPDATE without OUTPUT due to trigger conflict
-        await request
-            .input('id', sql.UniqueIdentifier, id)
-            .input('status', sql.NVarChar(20), status)
-            .query(`
-                UPDATE ${this.TABLE_NAME}
-                SET status = @status
-                WHERE id = @id
-            `);
-        
-        // Fetch updated record
-        return await this.findById(pool, id);
+<span class="fstat-no" title="function not covered" >    st</span>atic handleDomainException(err, res) {
+        // Map domain error codes to HTTP status codes
+        const statusCodeMap = <span class="cstat-no" title="statement not covered" >{</span>
+            'TASK_NOT_FOUND': 404,
+            'USER_NOT_FOUND': 404,
+            'INVALID_CREDENTIALS': 401,
+            'USER_ALREADY_EXISTS': 409,
+            'INVALID_TASK_DATA': 400,
+            'INVALID_USER_DATA': 400,
+            'INVALID_STATUS_TRANSITION': 422,
+            'INVALID_DEADLINE': 400,
+            'TITLE_REQUIRED': 400,
+            'STATUS_REQUIRED': 400,
+            'USERNAME_REQUIRED': 400,
+            'PASSWORD_REQUIRED': 400,
+            'UNAUTHORIZED': 401,
+            'FORBIDDEN': 403
+        };
+&nbsp;
+        const statusCode = <span class="cstat-no" title="statement not covered" >statusCodeMap[err.code] || 400;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        return res.status(statusCode).json({</span>
+            success: false,
+            error: err.message,
+            code: err.code
+        });
     }
 &nbsp;
     /**
-     * Delete task
+     * Handle database errors
+     * @param {Error} err - Database error
+     * @param {Object} res - Express response
      */
-    static async delete(pool, id) {
-        const request = pool.request();
-        await request
-            .input('id', sql.UniqueIdentifier, id)
-            .query(`DELETE FROM ${this.TABLE_NAME} WHERE id = @id`);
+<span class="fstat-no" title="function not covered" >    st</span>atic handleDatabaseError(err, res) {
+<span class="cstat-no" title="statement not covered" >        console.error('Database error:', {</span>
+            code: err.code,
+            message: err.message,
+            stack: Config.NODE_ENV === 'development' ? err.stack : undefined
+        });
+&nbsp;
+        // Common SQL Server error codes
+<span class="cstat-no" title="statement not covered" >        if (err.code === 'ELOGIN') {</span>
+<span class="cstat-no" title="statement not covered" >            return res.status(500).json({</span>
+                success: false,
+                error: 'Database authentication failed'
+            });
+        }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        if (err.code === 'EREQUEST') {</span>
+<span class="cstat-no" title="statement not covered" >            return res.status(400).json({</span>
+                success: false,
+                error: 'Invalid database request'
+            });
+        }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        if (err.code === 'ETIMEOUT') {</span>
+<span class="cstat-no" title="statement not covered" >            return res.status(503).json({</span>
+                success: false,
+                error: 'Database connection timeout'
+            });
+        }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        return res.status(500).json({</span>
+            success: false,
+            error: 'Database error occurred'
+        });
     }
 &nbsp;
     /**
-     * Delete all tasks by user ID
+     * Handle unexpected errors
+     * @param {Error} err - Error object
+     * @param {Object} res - Express response
      */
-<span class="fstat-no" title="function not covered" >    st</span>atic async deleteByUserId(pool, userId) {
-        const request = <span class="cstat-no" title="statement not covered" >pool.request();</span>
-<span class="cstat-no" title="statement not covered" >        await request</span>
-            .input('userId', sql.UniqueIdentifier, userId)
-            .query(`DELETE FROM ${this.TABLE_NAME} WHERE user_id = @userId`);
+<span class="fstat-no" title="function not covered" >    st</span>atic handleUnexpectedError(err, res) {
+<span class="cstat-no" title="statement not covered" >        console.error('Unexpected error:', {</span>
+            name: err.name,
+            message: err.message,
+            stack: Config.NODE_ENV === 'development' ? err.stack : undefined
+        });
+&nbsp;
+        // Different response for development vs production
+<span class="cstat-no" title="statement not covered" >        if (Config.NODE_ENV === 'development') {</span>
+<span class="cstat-no" title="statement not covered" >            return res.status(500).json({</span>
+                success: false,
+                error: 'Internal server error',
+                details: {
+                    name: err.name,
+                    message: err.message,
+                    stack: err.stack
+                }
+            });
+        }
+&nbsp;
+        // Production: don't expose error details
+<span class="cstat-no" title="statement not covered" >        return res.status(500).json({</span>
+            success: false,
+            error: 'Internal server error'
+        });
     }
 &nbsp;
     /**
-     * Count tasks by user ID and status
+     * Log error with context
+     * @param {Error} err - Error object
+     * @param {Object} req - Express request
      */
-    static async countByUserIdAndStatus(pool, userId, status) {
-        const request = pool.request();
-        const result = await request
-            .input('userId', sql.UniqueIdentifier, userId)
-            .input('status', sql.NVarChar(20), status)
-            .query(`
-                SELECT COUNT(*) as count FROM ${this.TABLE_NAME} 
-                WHERE user_id = @userId AND status = @status
-            `);
-        return result.recordset[0].count;
+<span class="fstat-no" title="function not covered" >    st</span>atic logError(err, req) {
+        const errorLog = <span class="cstat-no" title="statement not covered" >{</span>
+            timestamp: new Date().toISOString(),
+            method: req.method,
+            url: req.originalUrl,
+            ip: req.ip,
+            userAgent: req.get('user-agent'),
+            error: {
+                name: err.name,
+                message: err.message,
+                code: err.code,
+                stack: Config.NODE_ENV === 'development' ? err.stack : undefined
+            }
+        };
+&nbsp;
+        // In production, you would send this to a logging service
+        // (e.g., winston, bunyan, CloudWatch, Sentry)
+<span class="cstat-no" title="statement not covered" >        console.error('Error occurred:', JSON.stringify(errorLog, null, 2));</span>
     }
 &nbsp;
     /**
-     * Get statistics for user
+     * 404 Not Found handler
+     * @param {Object} req - Express request
+     * @param {Object} res - Express response
      */
-<span class="fstat-no" title="function not covered" >    st</span>atic async getStatistics(pool, userId) {
-        const request = <span class="cstat-no" title="statement not covered" >pool.request();</span>
-        const result = <span class="cstat-no" title="statement not covered" >await request</span>
-            .input('userId', sql.UniqueIdentifier, userId)
-            .query(`
-                SELECT 
-                    COUNT(*) as total,
-                    SUM(CASE WHEN status = 'PENDING' THEN 1 ELSE 0 END) as pending,
-                    SUM(CASE WHEN status = 'IN_PROGRESS' THEN 1 ELSE 0 END) as in_progress,
-                    SUM(CASE WHEN status = 'COMPLETED' THEN 1 ELSE 0 END) as completed,
-                    CAST(
-                        (SUM(CASE WHEN status = 'COMPLETED' THEN 1.0 ELSE 0 END) / 
-                        NULLIF(COUNT(*), 0)) * 100 
-                        AS DECIMAL(5,2)
-                    ) as completion_rate
-                FROM ${this.TABLE_NAME}
-                WHERE user_id = @userId
-            `);
-<span class="cstat-no" title="statement not covered" >        return result.recordset[0];</span>
+<span class="fstat-no" title="function not covered" >    st</span>atic notFound(req, res) {
+<span class="cstat-no" title="statement not covered" >        res.status(404).json({</span>
+            success: false,
+            error: 'Route not found',
+            path: req.originalUrl
+        });
     }
 }
 &nbsp;
-module.exports = { TaskModel };
+module.exports = { ErrorHandlerMiddleware };
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -687,14 +699,14 @@ module.exports = { TaskModel };
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
                 at 2025-12-16T07:49:47.963Z
             </div>
-        <script src="../../../prettify.js"></script>
+        <script src="../../prettify.js"></script>
         <script>
             window.onload = function () {
                 prettyPrint();
             };
         </script>
-        <script src="../../../sorter.js"></script>
-        <script src="../../../block-navigation.js"></script>
+        <script src="../../sorter.js"></script>
+        <script src="../../block-navigation.js"></script>
     </body>
 </html>
     

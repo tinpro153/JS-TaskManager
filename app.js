@@ -136,14 +136,13 @@ class App {
      * Setup error handlers
      */
     setupErrorHandlers() {
-        // Global error handler
-        this.app.use((err, req, res, next) => {
-            console.error('Unhandled error:', err);
-            res.status(500).json({
-                success: false,
-                error: 'Internal server error'
-            });
-        });
+        const { ErrorHandlerMiddleware } = require('./adapters/middleware/ErrorHandlerMiddleware');
+
+        // 404 handler (must be after all routes)
+        this.app.use(ErrorHandlerMiddleware.notFound);
+
+        // Global error handler (must be last middleware)
+        this.app.use(ErrorHandlerMiddleware.handle);
     }
 
     /**

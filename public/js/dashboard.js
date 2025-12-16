@@ -1,10 +1,17 @@
 /**
  * Dashboard Page JavaScript
+ * Manages task list, statistics, and CRUD operations
+ * Follows Clean Architecture principles: UI -> API -> Backend
  */
 
-let currentFilter = 'ALL';
-let currentEditingTaskId = null;
+// Global state management
+let currentFilter = 'ALL';  // Current filter: ALL | PENDING | IN_PROGRESS | COMPLETED
+let currentEditingTaskId = null;  // Task ID being edited in modal
 
+/**
+ * Initialize dashboard on page load
+ * Flow: Check auth -> Load user info -> Load statistics -> Load tasks
+ */
 document.addEventListener('DOMContentLoaded', async () => {
     // Check authentication
     if (!API.getToken()) {
@@ -19,6 +26,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupEventListeners();
 });
 
+/**
+ * Initialize dashboard components
+ * Sequential loading: user info -> statistics -> tasks
+ * @async
+ * @throws {Error} When authentication fails (redirects to login)
+ */
 async function init() {
     try {
         // Load user info
@@ -38,6 +51,11 @@ async function init() {
     }
 }
 
+/**
+ * Setup all event listeners for dashboard interactions
+ * Handles: logout, create task, modal close, filter buttons
+ * Best practice: Centralized event listener setup
+ */
 function setupEventListeners() {
     // Logout button
     document.getElementById('logoutBtn').addEventListener('click', handleLogout);
@@ -68,6 +86,13 @@ function setupEventListeners() {
     });
 }
 
+/**
+ * Load and display current user information
+ * Uses JWT token from localStorage for authentication
+ * @async
+ * @throws {Error} When API call fails (logged, not thrown)
+ * @see API.getCurrentUser()
+ */
 async function loadUserInfo() {
     try {
         const response = await API.getCurrentUser();
@@ -80,21 +105,42 @@ async function loadUserInfo() {
     }
 }
 
+/**
+ * Load and display task statistics
+ * Shows: total tasks, pending, in progress, completed counts
+ * @async
+ * @throws {Error} When API call fails (logged, not thrown)
+ * @see API.getStatistics()
+ */
 async function loadStatistics() {
     try {
         const response = await API.getStatistics();
         if (response.success && response.statistics) {
             const stats = response.statistics;
-            document.getElementById('statTotal').textContent = stats.total || 0;
-            document.getElementById('statPending').textContent = stats.pending || 0;
-            document.getElementById('statInProgress').textContent = stats.inProgress || 0;
-            document.getElementById('statCompleted').textContent = stats.completed || 0;
+            // Map API response fields to UI elements
+            document.getElementById('statTotal').textContent = stats.totalTasks || 0;
+            document.getElementById('statPending').textContent = stats.pendingTasks || 0;
+            document.getElementById('statInProgress').textContent = stats.inProgressTasks || 0;
+            document.getElementById('statCompleted').textContent = stats.completedTasks || 0;
         }
     } catch (error) {
         console.error('Failed to load statistics:', error);
     }
 }
 
+/**
+ * Load and display task list with optional status filter
+ * Shows loading spinner -> fetches tasks -> renders task cards
+ * Includes fade-in animation for better UX
+ * @async
+ * @param {string|null} status - Task status filter (PENDING | IN_PROGRESS | COMPLETED) or null for all
+ * @throws {Error} When API call fails (shows error state with retry button)
+ * @see API.getTasks()
+ * @see createTaskCard()
+ * @example
+ * await loadTasks('PENDING');  // Load only pending tasks
+ * await loadTasks(null);       // Load all tasks
+ */
 async function loadTasks(status = null) {
     const taskList = document.getElementById('taskList');
     taskList.innerHTML = `
@@ -154,12 +200,41 @@ async function loadTasks(status = null) {
     }
 }
 
+/**
+ * Create HTML card for a task with progress bar and actions
+ * Progress bar color coding:
+ * - Green (safe): 0-49%
+ * - Yellow (warning): 50-79%
+ * - Red (danger): 80-100%+
+ * @param {Object} task - Task object from API
+ * @param {string} task.id - Task UUID
+ * @param {string} task.title - Task title
+ * @param {string} task.description - Task description (optional)
+ * @param {string} task.status - Task status (PENDING | IN_PROGRESS | COMPLETED)
+ * @param {string} task.startDate - ISO 8601 date string
+ * @param {string} task.deadline - ISO 8601 date string or null
+ * @param {number} task.progress - Progress percentage (0-100+)
+ * @param {boolean} task.isOverdue - Whether task is past deadline
+ * @returns {string} HTML string for task card
+ * @example
+ * const html = createTaskCard({
+ *   id: '123',
+ *   title: 'Test Task',
+ *   status: 'IN_PROGRESS',
+ *   progress: 65.5,
+ *   isOverdue: false
+ * });
+ */
 function createTaskCard(task) {
-    // Progress bar color based on percentage
+    // Progress bar color based on percentage and status
     let progressClass = 'safe';
     let progressPercent = task.progress || 0;
     
-    if (progressPercent >= 80) {
+    // If task is completed, use gray color and stop at 100%
+    if (task.status === 'COMPLETED') {
+        progressClass = 'completed';
+        progressPercent = 100;
+    } else if (progressPercent >= 80) {
         progressClass = 'danger';
     } else if (progressPercent >= 50) {
         progressClass = 'warning';
@@ -174,7 +249,7 @@ function createTaskCard(task) {
         `<button class="quick-complete-btn" data-id="${task.id}" data-status="COMPLETED">✓ Hoàn thành</button>` : '';
 
     return `
-        <div class="task-card">
+        <div class="task-card" data-task-id="${task.id}">
             <div class="task-header">
                 <h3 class="task-title">${escapeHtml(task.title)}</h3>
                 <div class="task-actions">
@@ -210,8 +285,12 @@ function createTaskCard(task) {
         </div>
     `;
 }
-
-function attachTaskActionListeners() {
+/**
+ * Attach event listeners to task action buttons
+ * Must be called after task cards are rendered
+ * Handles: edit, delete, quick complete buttons
+ * Best practice: Delegate events for dynamically created elements
+ */function attachTaskActionListeners() {
     // Edit buttons
     document.querySelectorAll('.btn-edit').forEach(btn => {
         btn.addEventListener('click', (e) => {
@@ -238,6 +317,13 @@ function attachTaskActionListeners() {
     });
 }
 
+/**
+ * Handle filter button click to filter tasks by status
+ * Updates UI state and reloads task list
+ * @param {string} status - Filter status (ALL | PENDING | IN_PROGRESS | COMPLETED)
+ * @example
+ * handleFilterChange('PENDING');  // Show only pending tasks
+ */
 function handleFilterChange(status) {
     currentFilter = status;
 
@@ -254,6 +340,20 @@ function handleFilterChange(status) {
     loadTasks(filterStatus);
 }
 
+/**
+ * Open task modal for create or edit mode
+ * Edit mode: pre-fills form with task data
+ * Create mode: sets default startDate to now
+ * @param {Object|null} task - Task object for edit mode, null for create mode
+ * @param {string} task.id - Task UUID
+ * @param {string} task.title - Task title
+ * @param {string} task.description - Task description
+ * @param {string} task.startDate - ISO 8601 date
+ * @param {string} task.deadline - ISO 8601 date
+ * @example
+ * openTaskModal();           // Create new task
+ * openTaskModal(taskObj);    // Edit existing task
+ */
 function openTaskModal(task = null) {
     const modal = document.getElementById('taskModal');
     const modalTitle = document.getElementById('modalTitle');
@@ -281,20 +381,36 @@ function openTaskModal(task = null) {
         taskForm.reset();
         document.getElementById('taskId').value = '';
         
-        // Set default start date to now
-        document.getElementById('taskStartDate').value = formatDateForInput(new Date());
+        // Do NOT set default start date - let user choose or leave empty
+        // Backend will default to now if not provided
     }
 
     Utils.hideError('taskFormError');
     modal.classList.add('active');
 }
 
+/**
+ * Close task modal and reset state
+ * Clears currentEditingTaskId and removes active class
+ */
 function closeTaskModal() {
     const modal = document.getElementById('taskModal');
     modal.classList.remove('active');
     currentEditingTaskId = null;
 }
 
+/**
+ * Handle task form submission (create or update)
+ * Validates input, calls API, updates UI on success
+ * Validation rules:
+ * - Title is required
+ * - Deadline must be after startDate
+ * @async
+ * @param {Event} e - Form submit event
+ * @throws {Error} When API call fails (shows error message)
+ * @see API.createTask()
+ * @see API.updateTask()
+ */
 async function handleTaskFormSubmit(e) {
     e.preventDefault();
     Utils.hideError('taskFormError');
@@ -350,10 +466,26 @@ async function handleTaskFormSubmit(e) {
     }
 }
 
+/**
+ * Handle edit task button click
+ * Fetches task data from API and opens modal in edit mode
+ * @async
+ * @param {string} taskId - Task UUID to edit
+ * @throws {Error} When API call fails (shows notification)
+ * @see API.getTaskById()
+ * @see openTaskModal()
+ */
 async function handleEditTask(taskId) {
     if (!taskId) {
         showNotification('Không tìm thấy thông tin công việc', 'error');
         return;
+    }
+    
+    // Show loading state
+    const taskCard = document.querySelector(`[data-task-id="${taskId}"]`);
+    if (taskCard) {
+        taskCard.style.opacity = '0.5';
+        taskCard.style.pointerEvents = 'none';
     }
     
     try {
@@ -363,9 +495,24 @@ async function handleEditTask(taskId) {
         }
     } catch (error) {
         showNotification('Không thể tải thông tin công việc: ' + error.message, 'error');
+    } finally {
+        // Remove loading state
+        if (taskCard) {
+            taskCard.style.opacity = '1';
+            taskCard.style.pointerEvents = 'auto';
+        }
     }
 }
 
+/**
+ * Handle delete task button click
+ * Shows confirmation dialog before deletion
+ * Updates statistics and reloads task list on success
+ * @async
+ * @param {string} taskId - Task UUID to delete
+ * @throws {Error} When API call fails (shows notification)
+ * @see API.deleteTask()
+ */
 async function handleDeleteTask(taskId) {
     if (!taskId) {
         showNotification('Không tìm thấy thông tin công việc', 'error');
@@ -376,6 +523,13 @@ async function handleDeleteTask(taskId) {
         return;
     }
 
+    // Show loading state
+    const taskCard = document.querySelector(`[data-task-id="${taskId}"]`);
+    if (taskCard) {
+        taskCard.style.opacity = '0.5';
+        taskCard.style.pointerEvents = 'none';
+    }
+
     try {
         await API.deleteTask(taskId);
         showNotification('Đã xóa công việc thành công', 'success');
@@ -383,13 +537,39 @@ async function handleDeleteTask(taskId) {
         await loadTasks(currentFilter === 'ALL' ? null : currentFilter);
     } catch (error) {
         showNotification('Không thể xóa công việc: ' + error.message, 'error');
+        // Restore card if error
+        if (taskCard) {
+            taskCard.style.opacity = '1';
+            taskCard.style.pointerEvents = 'auto';
+        }
     }
 }
 
+/**
+ * Handle quick complete button click (change task status)
+ * Updates task status and refreshes UI
+ * @async
+ * @param {string} taskId - Task UUID
+ * @param {string} newStatus - New status (PENDING | IN_PROGRESS | COMPLETED)
+ * @throws {Error} When API call fails (shows notification)
+ * @see API.changeTaskStatus()
+ */
 async function handleStatusChange(taskId, newStatus) {
     if (!taskId) {
         showNotification('Không tìm thấy thông tin công việc', 'error');
         return;
+    }
+    
+    // Show loading state
+    const taskCard = document.querySelector(`[data-task-id="${taskId}"]`);
+    const statusButton = taskCard?.querySelector('.status-btn');
+    
+    if (taskCard) {
+        taskCard.style.opacity = '0.5';
+    }
+    if (statusButton) {
+        statusButton.disabled = true;
+        statusButton.textContent = 'Đang xử lý...';
     }
     
     try {
@@ -399,9 +579,31 @@ async function handleStatusChange(taskId, newStatus) {
         await loadTasks(currentFilter === 'ALL' ? null : currentFilter);
     } catch (error) {
         showNotification('Không thể thay đổi trạng thái: ' + error.message, 'error');
+        // Restore button if error
+        if (taskCard) {
+            taskCard.style.opacity = '1';
+        }
+        if (statusButton) {
+            statusButton.disabled = false;
+            // Restore original text based on status
+            const statusMap = {
+                'PENDING': '⏸️ Tạm dừng',
+                'IN_PROGRESS': '▶️ Bắt đầu',
+                'COMPLETED': '✅ Hoàn thành'
+            };
+            statusButton.textContent = statusMap[newStatus] || 'Cập nhật';
+        }
     }
 }
 
+/**
+ * Handle logout button click
+ * Shows confirmation, calls logout API, removes token, redirects to login
+ * Best practice: Always remove token on logout (security)
+ * @async
+ * @see API.logout()
+ * @see API.removeToken()
+ */
 async function handleLogout() {
     if (!confirm('Bạn có chắc chắn muốn đăng xuất?')) {
         return;
@@ -417,12 +619,31 @@ async function handleLogout() {
     }
 }
 
+/**
+ * Escape HTML to prevent XSS attacks
+ * Security best practice: Always escape user input before rendering
+ * @param {string} text - Raw text to escape
+ * @returns {string} HTML-safe escaped text
+ * @example
+ * escapeHtml('<script>alert("XSS")</script>');
+ * // Returns: '&lt;script&gt;alert("XSS")&lt;/script&gt;'
+ */
 function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
 }
 
+/**
+ * Show toast notification to user
+ * Auto-dismisses after 3 seconds
+ * Only one notification shown at a time (removes existing)
+ * @param {string} message - Notification message
+ * @param {string} type - Notification type ('success' | 'error' | 'warning')
+ * @example
+ * showNotification('Task created successfully', 'success');
+ * showNotification('Failed to delete task', 'error');
+ */
 function showNotification(message, type = 'success') {
     // Remove existing notifications
     const existing = document.querySelector('.toast');
@@ -444,7 +665,15 @@ function showNotification(message, type = 'success') {
     }, 3000);
 }
 
-// Helper function to format date for datetime-local input
+/**
+ * Format Date object for HTML datetime-local input
+ * Converts ISO 8601 date to 'YYYY-MM-DDTHH:mm' format
+ * @param {Date|string} date - Date object or ISO 8601 string
+ * @returns {string} Formatted date string for datetime-local input
+ * @example
+ * formatDateForInput(new Date('2025-01-15T14:30:00'));
+ * // Returns: '2025-01-15T14:30'
+ */
 function formatDateForInput(date) {
     const d = new Date(date);
     const year = d.getFullYear();

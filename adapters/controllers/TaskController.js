@@ -230,8 +230,15 @@ class TaskController {
                 success: true,
                 task: {
                     id: result.taskId,
+                    title: result.title,
+                    description: result.description,
                     status: result.status,
-                    updated_at: result.updatedAt
+                    userId: result.userId,
+                    startDate: result.startDate,
+                    deadline: result.deadline,
+                    progress: result.progress,
+                    isOverdue: result.isOverdue,
+                    updatedAt: result.updatedAt
                 },
                 message: 'Task status updated successfully'
             });

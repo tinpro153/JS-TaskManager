@@ -12,10 +12,10 @@ class GetTaskStatisticsInputDTO {
  */
 class GetTaskStatisticsOutputDTO {
     constructor(total, pending, inProgress, completed, completionRate) {
-        this.total = total;
-        this.pending = pending;
-        this.inProgress = inProgress;
-        this.completed = completed;
+        this.totalTasks = total;
+        this.pendingTasks = pending;
+        this.inProgressTasks = inProgress;
+        this.completedTasks = completed;
         this.completionRate = completionRate;
     }
 }

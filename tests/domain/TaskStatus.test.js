@@ -3,15 +3,15 @@ const { TaskStatus } = require('../../domain/valueobjects/TaskStatus');
 describe('TaskStatus Value Object', () => {
     describe('Constants', () => {
         it('should have PENDING status', () => {
-            expect(TaskStatus.PENDING).toBe('Pending');
+            expect(TaskStatus.PENDING).toBe('PENDING');
         });
 
         it('should have IN_PROGRESS status', () => {
-            expect(TaskStatus.IN_PROGRESS).toBe('In Progress');
+            expect(TaskStatus.IN_PROGRESS).toBe('IN_PROGRESS');
         });
 
         it('should have COMPLETED status', () => {
-            expect(TaskStatus.COMPLETED).toBe('Completed');
+            expect(TaskStatus.COMPLETED).toBe('COMPLETED');
         });
     });
 
@@ -20,23 +20,23 @@ describe('TaskStatus Value Object', () => {
             const statuses = TaskStatus.getAllStatuses();
             
             expect(statuses).toHaveLength(3);
-            expect(statuses).toContain('Pending');
-            expect(statuses).toContain('In Progress');
-            expect(statuses).toContain('Completed');
+            expect(statuses).toContain('PENDING');
+            expect(statuses).toContain('IN_PROGRESS');
+            expect(statuses).toContain('COMPLETED');
         });
     });
 
     describe('isValid', () => {
         it('should validate Pending', () => {
-            expect(TaskStatus.isValid('Pending')).toBe(true);
+            expect(TaskStatus.isValid('PENDING')).toBe(true);
         });
 
         it('should validate In Progress', () => {
-            expect(TaskStatus.isValid('In Progress')).toBe(true);
+            expect(TaskStatus.isValid('IN_PROGRESS')).toBe(true);
         });
 
         it('should validate Completed', () => {
-            expect(TaskStatus.isValid('Completed')).toBe(true);
+            expect(TaskStatus.isValid('COMPLETED')).toBe(true);
         });
 
         it('should reject invalid status', () => {
@@ -54,27 +54,27 @@ describe('TaskStatus Value Object', () => {
 
     describe('fromString', () => {
         it('should convert valid string to status', () => {
-            expect(TaskStatus.fromString('Pending')).toBe('Pending');
-            expect(TaskStatus.fromString('In Progress')).toBe('In Progress');
-            expect(TaskStatus.fromString('Completed')).toBe('Completed');
+            expect(TaskStatus.fromString('Pending')).toBe('PENDING');
+            expect(TaskStatus.fromString('In Progress')).toBe('IN_PROGRESS');
+            expect(TaskStatus.fromString('Completed')).toBe('COMPLETED');
         });
 
         it('should handle case-insensitive input', () => {
-            expect(TaskStatus.fromString('pending')).toBe('Pending');
-            expect(TaskStatus.fromString('in progress')).toBe('In Progress');
-            expect(TaskStatus.fromString('COMPLETED')).toBe('Completed');
+            expect(TaskStatus.fromString('pending')).toBe('PENDING');
+            expect(TaskStatus.fromString('in progress')).toBe('IN_PROGRESS');
+            expect(TaskStatus.fromString('COMPLETED')).toBe('COMPLETED');
         });
 
         it('should default to PENDING for null', () => {
-            expect(TaskStatus.fromString(null)).toBe('Pending');
+            expect(TaskStatus.fromString(null)).toBe('PENDING');
         });
 
         it('should default to PENDING for undefined', () => {
-            expect(TaskStatus.fromString(undefined)).toBe('Pending');
+            expect(TaskStatus.fromString(undefined)).toBe('PENDING');
         });
 
         it('should default to PENDING for empty string', () => {
-            expect(TaskStatus.fromString('')).toBe('Pending');
+            expect(TaskStatus.fromString('')).toBe('PENDING');
         });
 
         it('should throw error for invalid status', () => {

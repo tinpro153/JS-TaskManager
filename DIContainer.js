@@ -1,8 +1,8 @@
-const { SqlServerDatabase } = require('./infrastructure/database/MongoDatabase');
+const { SqlServerDatabase } = require('./infrastructure/database/SqlServerDatabase');
 const { BcryptPasswordService } = require('./infrastructure/security/BcryptPasswordService');
 const { JwtTokenService } = require('./infrastructure/security/JwtTokenService');
-const { SqlUserRepository } = require('./adapters/repositories/MongoUserRepository');
-const { SqlTaskRepository } = require('./adapters/repositories/MongoTaskRepository');
+const { SqlUserRepository } = require('./adapters/repositories/SqlUserRepository');
+const { SqlTaskRepository } = require('./adapters/repositories/SqlTaskRepository');
 const { Config } = require('./infrastructure/config/Config');
 
 // Use Cases

@@ -3,9 +3,9 @@
  * Represents the lifecycle states of a task
  */
 class TaskStatus {
-    static PENDING = 'Pending';
-    static IN_PROGRESS = 'In Progress';
-    static COMPLETED = 'Completed';
+    static PENDING = 'PENDING';
+    static IN_PROGRESS = 'IN_PROGRESS';
+    static COMPLETED = 'COMPLETED';
 
     static getAllStatuses() {
         return [this.PENDING, this.IN_PROGRESS, this.COMPLETED];
@@ -32,6 +32,13 @@ class TaskStatus {
         
         if (found) {
             return found;
+        }
+        
+        // Convert from old format with spaces to new format
+        // "In Progress" -> "IN_PROGRESS", "Pending" -> "PENDING"
+        const withUnderscores = normalized.toUpperCase().replace(/\s+/g, '_');
+        if (this.isValid(withUnderscores)) {
+            return withUnderscores;
         }
         
         throw new Error(`Invalid task status: ${status}`);

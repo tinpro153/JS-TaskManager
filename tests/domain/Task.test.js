@@ -55,6 +55,8 @@ describe('Task Entity', () => {
 
     describe('reconstruct', () => {
         it('should reconstruct task from database data', () => {
+            const startDate = new Date('2024-12-01');
+            const deadline = new Date('2025-01-15');
             const createdAt = new Date('2025-01-01');
             const updatedAt = new Date('2025-01-02');
             
@@ -64,6 +66,8 @@ describe('Task Entity', () => {
                 'Milk, eggs',
                 TaskStatus.IN_PROGRESS,
                 'user123',
+                startDate,
+                deadline,
                 createdAt,
                 updatedAt
             );
@@ -73,6 +77,8 @@ describe('Task Entity', () => {
             expect(task.getDescription()).toBe('Milk, eggs');
             expect(task.getStatus()).toBe(TaskStatus.IN_PROGRESS);
             expect(task.getUserId()).toBe('user123');
+            expect(task.getStartDate()).toBe(startDate);
+            expect(task.getDeadline()).toBe(deadline);
             expect(task.getCreatedAt()).toBe(createdAt);
             expect(task.getUpdatedAt()).toBe(updatedAt);
         });

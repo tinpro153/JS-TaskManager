@@ -25,10 +25,10 @@ describe('GetTaskStatisticsUseCase', () => {
             const result = await useCase.execute('user123');
 
             // Assert
-            expect(result.total).toBe(10);
-            expect(result.pending).toBe(3);
-            expect(result.inProgress).toBe(2);
-            expect(result.completed).toBe(5);
+            expect(result.totalTasks).toBe(10);
+            expect(result.pendingTasks).toBe(3);
+            expect(result.inProgressTasks).toBe(2);
+            expect(result.completedTasks).toBe(5);
             expect(result.completionRate).toBe(50);
             expect(mockTaskRepository.countByUserIdAndStatus).toHaveBeenCalledTimes(3);
         });
@@ -41,7 +41,7 @@ describe('GetTaskStatisticsUseCase', () => {
 
             const result = await useCase.execute('user123');
 
-            expect(result.total).toBe(0);
+            expect(result.totalTasks).toBe(0);
             expect(result.completionRate).toBe(0);
         });
 

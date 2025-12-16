@@ -1,6 +1,6 @@
-const { SqlUserRepository } = require('../../adapters/repositories/MongoUserRepository');
+const { SqlUserRepository } = require('../../adapters/repositories/SqlUserRepository');
 const { User } = require('../../domain/entities/User');
-const { SqlServerDatabase } = require('../../infrastructure/database/MongoDatabase');
+const { SqlServerDatabase } = require('../../infrastructure/database/SqlServerDatabase');
 
 describe('SqlUserRepository Integration Tests', () => {
     let repository;

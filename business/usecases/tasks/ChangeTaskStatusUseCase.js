@@ -49,12 +49,8 @@ class ChangeTaskStatusUseCase {
         // Step 5: Persist changes
         const updatedTask = await this.taskRepository.update(task);
 
-        // Step 6: Return result
-        return {
-            taskId: updatedTask.getId(),
-            status: updatedTask.getStatus(),
-            updatedAt: updatedTask.getUpdatedAt()
-        };
+        // Step 6: Return result using DTO
+        return ChangeTaskStatusOutputDTO.fromTask(updatedTask);
     }
 
     /**
@@ -88,11 +84,7 @@ class ChangeTaskStatusUseCase {
         task.reopen();
         const updatedTask = await this.taskRepository.update(task);
 
-        return {
-            taskId: updatedTask.getId(),
-            status: updatedTask.getStatus(),
-            updatedAt: updatedTask.getUpdatedAt()
-        };
+        return ChangeTaskStatusOutputDTO.fromTask(updatedTask);
     }
 }
 

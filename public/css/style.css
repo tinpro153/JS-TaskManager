@@ -98,6 +98,7 @@ body {
 .btn {
     padding: 10px 20px;
     border: none;
+    border-radius: 8px;
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
@@ -201,8 +202,10 @@ body {
 .stat-card {
     background: linear-gradient(135deg, var(--white) 0%, var(--gray-100) 100%);
     padding: 1.5rem;
+    border-radius: 12px;
     box-shadow: var(--shadow);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 1px solid var(--gray-200);
 }
 
 .stat-card:hover {
@@ -270,6 +273,7 @@ body {
 .filter-btn {
     padding: 8px 16px;
     border: 2px solid var(--gray-300);
+    border-radius: 8px;
     background: var(--white);
     color: var(--gray-700);
     cursor: pointer;
@@ -301,11 +305,13 @@ body {
 .task-card {
     background: linear-gradient(135deg, var(--white) 0%, var(--gray-100) 100%);
     padding: 1rem;
+    border-radius: 12px;
     box-shadow: var(--shadow);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     position: relative;
     overflow: hidden;
     animation: fadeIn 0.3s ease;
+    border: 1px solid var(--gray-200);
 }
 
 .task-card:hover {
@@ -375,6 +381,7 @@ body {
 .progress-bar-container {
     height: 6px;
     background: var(--gray-200);
+    border-radius: 3px;
     overflow: hidden;
     position: relative;
 }
@@ -394,6 +401,11 @@ body {
 
 .progress-bar.danger {
     background: linear-gradient(90deg, var(--progress-danger) 0%, #f03e3e 100%);
+}
+
+.progress-bar.completed {
+    background: linear-gradient(90deg, var(--gray-400) 0%, var(--gray-500) 100%);
+    opacity: 0.7;
 }
 
 /* Task Footer */
@@ -474,11 +486,13 @@ body {
 .modal-content {
     background: linear-gradient(135deg, var(--white) 0%, var(--gray-100) 100%);
     padding: 2rem;
+    border-radius: 16px;
     max-width: 500px;
     width: 90%;
     max-height: 90vh;
     overflow-y: auto;
     box-shadow: var(--shadow-lg);
+    border: 1px solid var(--gray-200);
 }
 
 .modal-header {
@@ -533,6 +547,7 @@ body {
     width: 100%;
     padding: 10px 12px;
     border: 2px solid var(--gray-300);
+    border-radius: 8px;
     font-size: 1rem;
     font-family: inherit;
     background: var(--white);
@@ -731,9 +746,11 @@ select.form-control {
 .auth-card {
     background: linear-gradient(135deg, var(--white) 0%, var(--gray-100) 100%);
     padding: 2.5rem;
+    border-radius: 16px;
     max-width: 450px;
     width: 100%;
     box-shadow: var(--shadow-lg);
+    border: 1px solid var(--gray-200);
 }
 
 .auth-header {
@@ -782,6 +799,8 @@ select.form-control {
     background: var(--progress-danger);
     color: var(--white);
     padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
     margin-bottom: 1rem;
     text-align: center;
     font-weight: 500;

@@ -28,16 +28,17 @@ class GetTaskStatisticsUseCase {
         ]);
 
         const totalCount = pendingCount + inProgressCount + completedCount;
+        const completionRate = totalCount > 0 
+            ? Math.round((completedCount / totalCount) * 100) 
+            : 0;
 
-        return {
-            total: totalCount,
-            pending: pendingCount,
-            inProgress: inProgressCount,
-            completed: completedCount,
-            completionRate: totalCount > 0 
-                ? Math.round((completedCount / totalCount) * 100) 
-                : 0
-        };
+        return new GetTaskStatisticsOutputDTO(
+            totalCount,
+            pendingCount,
+            inProgressCount,
+            completedCount,
+            completionRate
+        );
     }
 }
 

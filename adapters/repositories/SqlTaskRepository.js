@@ -117,11 +117,13 @@ class SqlTaskRepository extends TaskRepository {
      * Convert SQL Server row to Domain entity
      */
     toDomain(row) {
+        const { TaskStatus } = require('../../domain/valueobjects/TaskStatus');
+        
         return Task.reconstruct(
             row.id.toLowerCase(), // Convert GUID to lowercase string
             row.title,
             row.description,
-            row.status,
+            TaskStatus.fromString(row.status), // Normalize status to uppercase
             row.user_id.toLowerCase(), // Convert GUID to lowercase string
             row.created_at,
             row.updated_at,

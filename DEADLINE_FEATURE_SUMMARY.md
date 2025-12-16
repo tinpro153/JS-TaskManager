@@ -50,7 +50,7 @@ Successfully implemented a comprehensive UI/UX redesign with deadline functional
 - Updated `update()`: Dynamic query builder for optional date updates
 - Migration script: `scripts/migrate-add-dates.js`
 
-**File**: `adapters/repositories/MongoTaskRepository.js` (SQL Server adapter)
+**File**: `adapters/repositories/SqlTaskRepository.js` (SQL Server adapter)
 - `save()`: Maps startDate/deadline to start_date/deadline
 - `update()`: Includes date fields
 - `toDomain()`: Maps database dates to Task entity
@@ -212,7 +212,7 @@ ADD start_date DATETIME2 DEFAULT GETDATE() NOT NULL,
 - `scripts/migrate-add-dates.js` (new file)
 
 ### Adapters Layer
-- `adapters/repositories/MongoTaskRepository.js`
+- `adapters/repositories/SqlTaskRepository.js`
 - `adapters/controllers/TaskController.js`
 
 ### Frontend
